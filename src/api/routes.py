@@ -15,7 +15,6 @@ bcrypt = Bcrypt()
 # Allow CORS requests to this API
 CORS(api)
 
-
 @api.route("/register", methods=["POST"])
 def handle_register():
     body = request.get_json(silent=True)
