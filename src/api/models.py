@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import String, Boolean, ForeignKey, Date
+from sqlalchemy import String, ForeignKey, DateTime, Boolean, ARRAY, Column
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from datetime import datetime, timezone
 
 db = SQLAlchemy()
 
@@ -10,10 +11,10 @@ class User(db.Model):
     password: Mapped[str] = mapped_column(nullable=False)
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     last_name: Mapped[str] = mapped_column(String(120), nullable=False)
-    favorites_array: Mapped[list[int]] = mapped_column(nullable=True)
+    favorites_array = Column(ARRAY(int), nullable=False, default=list)
     cash: Mapped[int] = mapped_column(nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
-    portfolio: Mapped[Portfolio]=relationship(back_populates="user")
+    portfolio: Mapped["Portfolio"]=relationship(back_populates="user")
 
     def serialize(self):
         return {
@@ -29,9 +30,10 @@ class User(db.Model):
 class Portfolio(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    user: Mapped[User]=relationship(back_populates="portfolio")
+    user: Mapped["User"]=relationship(back_populates="portfolio")
     product: Mapped[int]=mapped_column(nullable=False)
-    date: Mapped[Date] = mapped_column(nullable=False)
+    date: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    operations:Mapped["Operations"]=relationship(back_populates="portfolio")
 
     def serialize(self):
         return{
@@ -39,4 +41,23 @@ class Portfolio(db.Model):
             "user_id":self.id,
             "product":self.product,
             "date":self.date
+        }
+
+class Operations(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    product: Mapped[int]=mapped_column(ForeignKey("portfolio.product"))
+    portfolio:Mapped["Portfolio"]=relationship(back_populates="operations")
+    date: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    total_price_spent: Mapped[float] = mapped_column(nullable=True)
+    amount: Mapped[float]=mapped_column(nullable=False)
+    bought: Mapped[bool]=mapped_column(Boolean(), nullable=False)
+
+    def serialize(self):
+        return{
+            "id":self.id,
+            "product":self.product,
+            "date":self.date,
+            "total_price_spent":self.total_price_spent,
+            "amount":self.amount,
+            "bought":self.bought
         }
