@@ -10,7 +10,7 @@ class User(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, unique=True)
     email: Mapped[str] = mapped_column(
         String(120), unique=True, nullable=False)
-    password: Mapped[str] = mapped_column(nullable=False)
+    password: Mapped[str] = mapped_column(String(300), nullable=False)
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     last_name: Mapped[str] = mapped_column(String(120), nullable=False)
     favorites_array = Column(ARRAY(Integer), nullable=False, default=list)
