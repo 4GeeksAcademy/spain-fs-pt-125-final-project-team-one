@@ -15,7 +15,7 @@ class User(db.Model):
     last_name: Mapped[str] = mapped_column(String(120), nullable=False)
     favorites_array = Column(ARRAY(Integer), nullable=False, default=list)
     cash: Mapped[int] = mapped_column(nullable=True)
-    is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False, default=True)
     portfolio: Mapped["Portfolio"] = relationship(back_populates="user")
 
     def serialize(self):
