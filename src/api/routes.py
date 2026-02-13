@@ -23,6 +23,8 @@ def handle_register():
 
     email = body.get("email")
     password = body.get("password")
+    name = body.get("name")
+    last_name = body.get("last_name")
     
     if not email or not password:
         return jsonify({"msg": "Email y contraseña obligatorios"}), 400
@@ -33,7 +35,7 @@ def handle_register():
 
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
-    new_user = User(email=email, password=hashed_password, is_active=True)
+    new_user = User(email=email, password=hashed_password, name = name, last_name = last_name, is_active=True)
     db.session.add(new_user)
     db.session.commit()
     
