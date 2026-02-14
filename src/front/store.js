@@ -1,38 +1,24 @@
-export const initialStore=()=>{
-  return{
+export const initialStore = () => {
+  return {
     message: null,
-    todos: [
-      {
-        id: 1,
-        title: "Make the bed",
-        background: null,
-      },
-      {
-        id: 2,
-        title: "Do my homework",
-        background: null,
-      }
-    ]
-  }
-}
+    token: localStorage.getItem("jwt-token") || null, // Cargamos el token si ya existe
+  };
+};
 
 export default function storeReducer(store, action = {}) {
-  switch(action.type){
-    case 'set_hello':
+  switch (action.type) {
+    case "LOGIN":
       return {
         ...store,
-        message: action.payload
+        token: action.payload, // Guardamos el token en el estado global
       };
-      
-    case 'add_task':
-
-      const { id,  color } = action.payload
-
+      case 'LOGOUT':
       return {
         ...store,
-        todos: store.todos.map((todo) => (todo.id === id ? { ...todo, background: color } : todo))
+        token: null // Limpiamos el token del estado global
       };
+
     default:
-      throw Error('Unknown action.');
-  }    
+      throw Error("Unknown action.");
+  }
 }

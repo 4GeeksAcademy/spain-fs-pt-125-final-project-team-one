@@ -27,7 +27,6 @@ export const Login = () => {
                 alert("❌ Error 401: El email o la contraseña son incorrectos.");
                 return; // Cortamos la ejecución aquí
             }
-            // OTROS ERRORES (Servidor caído, ruta mal escrita, etc.)
             if (!resp.ok) {
                 const errorData = await resp.json();
                 alert(`⚠️ Error: ${errorData.msg || "No se pudo iniciar sesión"}`);
@@ -49,21 +48,23 @@ export const Login = () => {
     };
 
     return (
-        <div className="container mt-5">
+        <div className="container my-5 w-25">
             <h2>Login</h2>
             <input
                 className="form-control mb-2"
                 type="email"
                 placeholder="Email"
+                maxLength="50"
                 onChange={(e) => setEmail(e.target.value)}
             />
             <input
                 className="form-control mb-2"
                 type="password"
                 placeholder="Contraseña"
+                maxLength="20"
                 onChange={(e) => setPassword(e.target.value)}
             />
-            <button className="btn btn-primary" onClick={handleLogin}>
+            <button className="btn btn-success" onClick={handleLogin}>
                 Entrar
             </button>
         </div>

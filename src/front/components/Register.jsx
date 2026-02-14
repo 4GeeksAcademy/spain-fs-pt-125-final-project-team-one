@@ -31,30 +31,34 @@ export const Register = () => {
     };
 
     return (
-        <div className="container mt-5">
+        <div className="container my-5 w-25">
             <h2>Registro</h2>
             <input
                 className="form-control mb-2"
                 type="text"
                 placeholder="Nombre"
+                maxLength="50"
                 onChange={(e) => setName(e.target.value)}
             />
             <input
                 className="form-control mb-2"
                 type="text"
                 placeholder="Apellido"
+                maxLength="50"
                 onChange={(e) => setLast_name(e.target.value)}
             />
             <input
                 className="form-control mb-2"
                 type="email"
                 placeholder="Email"
+                maxLength="50"
                 onChange={(e) => setEmail(e.target.value)}
             />
             <input
                 className="form-control mb-2"
                 type="password"
                 placeholder="Contraseña"
+                maxLength="20"
                 onChange={(e) => setPassword(e.target.value)}
             />
             <button className="btn btn-primary" onClick={handleRegister}>
