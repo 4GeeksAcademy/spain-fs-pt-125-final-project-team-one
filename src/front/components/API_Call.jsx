@@ -7,7 +7,7 @@ const API_Call = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const options = { method: 'GET', headers: { 'x-cg-demo-api-key': 'CG-zEzVoDknRQgmq3QKL5wFqXh3'} };
+            const options = { method: 'GET', headers: { 'x-cg-demo-api-key': 'Pon Aqui la Api Key'} };
 
             try {
                 dispatch({ type: 'API_LOADING' });
