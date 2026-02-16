@@ -12,10 +12,15 @@ export default function storeReducer(store, action = {}) {
         ...store,
         token: action.payload, // Guardamos el token en el estado global
       };
-      case 'LOGOUT':
+    case "LOGOUT":
       return {
         ...store,
-        token: null // Limpiamos el token del estado global
+        token: null, // Limpiamos el token del estado global
+      };
+    case "SET_MESSAGE":
+      return {
+        ...store,
+        message: action.payload,
       };
 
     default:
