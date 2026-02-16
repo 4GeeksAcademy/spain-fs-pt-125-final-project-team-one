@@ -41,10 +41,10 @@ export const Home = () => {
 					<p className="lead mb-4">
 						Gestiona y analiza tus inversiones en el mercado de criptomonedas
 					</p>
-					<a href="/register" className="btn btn-light btn-lg me-2">
+					<a className="btn btn-light btn-lg me-2">
 						Registrate!
 					</a>
-					<a href="/login" className="btn btn-outline-light btn-lg">
+					<a className="btn btn-outline-light btn-lg">
 						Entrar
 					</a>
 				</div>
