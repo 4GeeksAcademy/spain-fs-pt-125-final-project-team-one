@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
 import rigoImageUrl from "../assets/img/rigo-baby.jpg";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
-import API_Call from "../components/API_Call";
+
 
 export const Home = () => {
 
@@ -47,10 +47,6 @@ export const Home = () => {
 						Loading message from the backend (make sure your python 🐍 backend is running)...
 					</span>
 				)}
-			</div>
-			<div className="mt-5">
-				<h2>API Data</h2>
-				<API_Call />
 			</div>
 		</div>
 	);
