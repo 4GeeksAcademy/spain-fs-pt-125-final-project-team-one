@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User
+from api.models import db, User, Portfolio
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
@@ -104,3 +104,32 @@ def toggle_favorite():
         "is_favorite": is_favorite,
         "favorites": user.favorites_array
     }), 200
+
+
+@api.route("/user/portfolio", methods=["POST"])
+@jwt_required()
+def add_to_portfolio():
+    user_id = get_jwt_identity()
+    body = request.get_json(silent=True)
+    if not body:
+        return jsonify({"msg": "Cuerpo faltante o JSON inválido"}), 400
+
+    product_id = body.get("product_id")
+    if product_id is None:
+        return jsonify({"msg": "product_id es obligatorio"}), 400
+
+    user = db.session.execute(select(User).where(
+        User.id == user_id)).scalar_one_or_none()
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+
+    # Crear nuevo portfolio entry
+    new_portfolio = Portfolio(user_id=user_id, product=product_id)
+    db.session.add(new_portfolio)
+    db.session.commit()
+
+    return jsonify({
+        "msg": "Producto agregado al portfolio",
+        "portfolio_id": new_portfolio.id,
+        "product": new_portfolio.product
+    }), 201

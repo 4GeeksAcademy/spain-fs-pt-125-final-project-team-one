@@ -16,6 +16,7 @@ export const Details = () => {
     const [savingFavorite, setSavingFavorite] = useState(false);
     const tvContainerId = `tv-widget-${product?.id ?? productIndex}`;
     const tvScriptRef = useRef(null);
+    const [addingPortfolio, setAddingPortfolio] = useState(false);
     // Validar que el índice existe
     if (isNaN(productIndex) || productIndex < 0 || productIndex >= products.length) {
         return (
@@ -26,6 +27,42 @@ export const Details = () => {
             </div>
         );
     }
+
+    const handleAddPortfolioClick = async () => {
+        const token = localStorage.getItem('access_token');
+        const userId = localStorage.getItem('user_id');
+
+        if (!token || !userId) {
+            alert('Por favor inicia sesión para agregar al portfolio');
+            return;
+        }
+
+        setAddingPortfolio(true);
+
+        try {
+            const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+            const response = await fetch(`${backendUrl}/api/user/portfolio`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ product_id: product.id }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al agregar al portfolio');
+            }
+
+            const data = await response.json();
+            alert('Moneda agregada al portfolio correctamente');
+        } catch (err) {
+            console.error('Error:', err);
+            alert('Error al agregar al portfolio: ' + err.message);
+        } finally {
+            setAddingPortfolio(false);
+        }
+    };
 
     const handleFavoriteClick = async () => {
         const token = localStorage.getItem('access_token');
@@ -47,7 +84,7 @@ export const Details = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({ product_id: productIndex }),
+                body: JSON.stringify({ product_id: product.id }),
             });
 
             if (!response.ok) {
@@ -232,7 +269,13 @@ export const Details = () => {
                                     <p className="text-muted small">Última actualización: {coin?.last_updated ?? 'N/A'}</p>
 
                                     <div className="mt-3">
-                                        <button className="btn btn-primary me-2">Agregar al portfolio</button>
+                                        <button
+                                            className="btn btn-primary me-2"
+                                            onClick={handleAddPortfolioClick}
+                                            disabled={addingPortfolio}
+                                        >
+                                            Agregar al portfolio
+                                        </button>
                                     </div>
                                 </>
                             )}
