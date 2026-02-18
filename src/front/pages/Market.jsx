@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 export const Market = () => {
@@ -45,7 +46,7 @@ export const Market = () => {
                                         )}
                                     </td>
                                     <td>
-                                        <span className="fw-bold">{product.name}</span> <small className="text-muted">{product.symbol.toUpperCase()}</small>
+                                        <span className="fw-bold"><Link to={`/market/${index}`}>{product.name}</Link></span> <small className="text-muted">{product.symbol.toUpperCase()}</small>
                                     </td>
                                     <td className="text-end fw-bold">${product.current_price.toFixed(2)}</td>
                                     <td className="text-end">
@@ -53,7 +54,7 @@ export const Market = () => {
                                             {product.price_change_percentage_24h > 0 ? '↑' : '↓'} {Math.abs(product.price_change_percentage_24h).toFixed(2)}%
                                         </span>
                                     </td>
-                                    
+
                                     <td className="text-end">${product.total_volume.toLocaleString()}</td>
                                     <td className="text-end">${product.market_cap.toLocaleString()}</td>
                                     <td className="text-end">
