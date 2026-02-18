@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useRef, memo } from 'react';
 import useGlobalReducer from '../hooks/useGlobalReducer';
-import '../styles/Details.css';
 
 export const Details = () => {
     const { index } = useParams();
@@ -8,7 +8,14 @@ export const Details = () => {
     const { store } = useGlobalReducer();
     const products = store?.api?.data || [];
     const productIndex = parseInt(index, 10);
-
+    const product = products[productIndex];
+    const [coin, setCoin] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [savingFavorite, setSavingFavorite] = useState(false);
+    const tvContainerId = `tv-widget-${product?.id ?? productIndex}`;
+    const tvScriptRef = useRef(null);
     // Validar que el índice existe
     if (isNaN(productIndex) || productIndex < 0 || productIndex >= products.length) {
         return (
@@ -20,24 +27,217 @@ export const Details = () => {
         );
     }
 
-    const product = products[productIndex];
+    const handleFavoriteClick = async () => {
+        const token = localStorage.getItem('access_token');
+        const userId = localStorage.getItem('user_id');
+
+        if (!token || !userId) {
+            alert('Por favor inicia sesión para agregar favoritos');
+            return;
+        }
+
+        setIsFavorite(!isFavorite);
+        setSavingFavorite(true);
+
+        try {
+            const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+            const response = await fetch(`${backendUrl}/api/user/favorites`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ product_id: productIndex }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al guardar favorito');
+            }
+
+            const data = await response.json();
+            setIsFavorite(data.is_favorite);
+        } catch (err) {
+            console.error('Error:', err);
+            setIsFavorite(!isFavorite);
+            alert('Error al guardar favorito: ' + err.message);
+        } finally {
+            setSavingFavorite(false);
+        }
+    };
+
+
+    useEffect(() => {
+        if (!product || !product.id) return;
+        setLoading(true);
+        setError(null);
+        const options = { method: 'GET', headers: { 'x-cg-demo-api-key': 'CG-zEzVoDknRQgmq3QKL5wFqXh3' } };
+        fetch(`https://api.coingecko.com/api/v3/coins/${product.id}`, options)
+            .then((res) => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
+            .then((data) => setCoin(data))
+            .catch((err) => setError(err.message || 'Error al obtener datos'))
+            .finally(() => setLoading(false));
+    }, [product]);
+
+    useEffect(() => {
+        if (!coin || !coin.symbol) return;
+
+        const containerId = tvContainerId;
+
+        const initWidget = () => {
+            try {
+                if (!window.TradingView) return;
+                const el = document.getElementById(containerId);
+                if (el) el.innerHTML = '';
+
+                new window.TradingView.widget({
+                    container_id: containerId,
+                    hide_side_toolbar: false,
+                    details: false,
+                    width: '100%',
+                    height: 420,
+                    symbol: `BINANCE:${String(coin.symbol).toUpperCase()}USDT`,
+                    interval: 'D',
+                    timezone: 'Etc/UTC',
+                    theme: 'light',
+                    style: '1',
+                    locale: 'es',
+                    toolbar_bg: '#f1f3f6',
+                    enable_publishing: false,
+                    allow_symbol_change: true,
+                    details: true,
+                });
+            } catch (e) {
+                // eslint-disable-next-line no-console
+                console.error('TradingView init error', e);
+            }
+        };
+
+        if (window.TradingView) {
+            initWidget();
+            return;
+        }
+
+        if (!tvScriptRef.current) {
+            const script = document.createElement('script');
+            script.src = 'https://s3.tradingview.com/tv.js';
+            script.async = true;
+            script.onload = initWidget;
+            document.head.appendChild(script);
+            tvScriptRef.current = script;
+        } else {
+            tvScriptRef.current.onload = initWidget;
+        }
+
+        return () => {
+            const el = document.getElementById(containerId);
+            if (el) el.innerHTML = '';
+        };
+    }, [coin, tvContainerId]);
+
 
     return (
-        <div className="details-container">
-            <button className="back-btn" onClick={() => navigate('/')}>
-                ← Volver
-            </button>
+        <div className="container py-4">
+            <div className="mb-3">
+                <button className="btn btn-link p-0" onClick={() => navigate('/market')}>← Volver al mercado</button>
+            </div>
 
-            <div className="product-detail">
-                <div className="product-image">
-                    <img src={product.image} alt={product.name} />
-                </div>
+            <div className="card shadow-sm">
+                <div className="card-body">
+                    <div className="row g-4">
+                        <div className="col-md-4 text-center">
+                            <img
+                                src={(coin && coin.image?.large) || product.image}
+                                alt={product.name}
+                                className="img-fluid rounded"
+                                style={{ maxHeight: 320, objectFit: 'contain' }}
+                            />
+                            <div className="mt-3">
+                                <ul className="list-group list-group-flush text-start">
+                                    <li className="list-group-item d-flex justify-content-between align-items-center py-2">
+                                        <span className="fw-bold">Precio</span>
+                                        <span className="text-end">{coin?.market_data?.current_price?.usd ?? product.price ?? 'N/A'} $</span>
+                                    </li>
 
-                <div className="product-info">
-                    <h1>{product.name}</h1>
-                    <p className="price">${(product.current_price ?? product.price ?? 0).toFixed(2)}</p>
-                    <p className="description">{product.description ?? product.symbol ?? ''}</p>
-                    <button className="add-to-cart">Agregar al carrito</button>
+                                    <li className="list-group-item d-flex justify-content-between align-items-center py-2">
+                                        <span className="fw-bold">Market Cap</span>
+                                        <span className="text-end">{coin?.market_data?.market_cap?.usd ?? 'N/A'} $</span>
+                                    </li>
+
+                                    <li className="list-group-item d-flex justify-content-between align-items-center py-2">
+                                        <span className="fw-bold">Volumen (24h)</span>
+                                        <span className="text-end">{coin?.market_data?.total_volume?.usd ?? 'N/A'} $</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div className="col-md-8">
+                            <h2 className="mb-1">
+                                {product.name}{' '}
+                                <small className="text-muted">{product.symbol ? `(${product.symbol.toUpperCase()})` : ''}</small>
+                                <button
+                                    onClick={handleFavoriteClick}
+                                    disabled={savingFavorite}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        cursor: savingFavorite ? 'not-allowed' : 'pointer',
+                                        marginLeft: '10px',
+                                        fontSize: '1.3rem',
+                                        padding: 0,
+                                        color: isFavorite ? '#FFD700' : '#D3D3D3',
+                                        transition: 'color 0.2s ease',
+                                        opacity: savingFavorite ? 0.6 : 1,
+                                    }}
+                                    title={isFavorite ? 'Remover de favoritos' : 'Agregar a favoritos'}
+                                >
+                                    ☆
+                                </button>
+                            </h2>
+
+                            {loading ? (
+                                <div className="d-flex align-items-center">
+                                    <div className="spinner-border text-primary me-3" role="status" aria-hidden="true"></div>
+                                    <div>Cargando detalles...</div>
+                                </div>
+                            ) : error ? (
+                                <div className="alert alert-danger">Error: {error}</div>
+                            ) : (
+                                <>
+
+                                    <div className="mb-2">
+                                        <span className="badge bg-secondary me-2">Rank: {coin?.market_cap_rank ?? 'N/A'}</span>
+
+                                    </div>
+
+                                    <p className="text-muted">
+                                        {coin?.description?.en
+                                            ? String(coin.description.en).replace(/<[^>]+>/g, '').slice(0, 400)
+                                            : product.description ?? ''}
+                                    </p>
+
+                                    <div id={tvContainerId} className="mt-3" />
+
+                                    {coin?.links?.homepage?.[0] ? (
+                                        <p className="mt-3">
+                                            <a href={coin.links.homepage[0]} target="_blank" rel="noreferrer" className="btn btn-link">
+                                                Página oficial de la moneda
+                                            </a>
+                                        </p>
+                                    ) : null}
+
+                                    <p className="text-muted small">Última actualización: {coin?.last_updated ?? 'N/A'}</p>
+
+                                    <div className="mt-3">
+                                        <button className="btn btn-primary me-2">Agregar al portfolio</button>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -45,3 +245,7 @@ export const Details = () => {
 };
 
 export default Details;
+
+
+
+
