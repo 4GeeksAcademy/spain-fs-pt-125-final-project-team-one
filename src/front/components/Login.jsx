@@ -1,20 +1,28 @@
 import React, { useState } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
-// Añadimos { id } para que el Navbar pueda abrirlo
 export const Login = ({ id }) => {
     const { store, dispatch } = useGlobalReducer();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const handleLogin = async () => {
-        // 1. Validación de campos vacíos
+
+        dispatch({ type: "SET_MESSAGE", payload: null });
+
         if (!email.trim() || !password.trim()) {
-            dispatch({ 
-                type: "SET_MESSAGE", 
-                payload: "⚠️ Los campos no pueden estar vacíos" 
+            dispatch({
+                type: "SET_MESSAGE",
+                payload: { text: "⚠️ Los campos están vacíos", status: 400 }
             });
-            return; 
+            return;
+        }
+        if (password.length < 6) {
+            dispatch({
+                type: "SET_MESSAGE",
+                payload: { text: "⚠️ La contraseña debe tener al menos 6 caracteres", status: 400 }
+            });
+            return;
         }
 
         try {
@@ -23,73 +31,60 @@ export const Login = ({ id }) => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password })
             });
-
-            // 2. Manejo de error 401 (Credenciales)
             if (resp.status === 401) {
-                dispatch({ 
-                    type: "SET_MESSAGE", 
-                    payload: "❌ El email o la contraseña son incorrectos." 
-                });
+                dispatch({ type: "SET_MESSAGE", payload: { text: "Email o contraseña incorrectos", status: 401 } });
                 return;
             }
-
-            // 3. Otros errores de servidor
             if (!resp.ok) {
-                const errorData = await resp.json();
-                dispatch({ 
-                    type: "SET_MESSAGE", 
-                    payload: `⚠️ Error: ${errorData.msg || "No se pudo iniciar sesión"}` 
-                });
+                dispatch({ type: "SET_MESSAGE", payload: { text: "Error de servidor", status: resp.status } });
                 return;
             }
-
-            // 4. LOGIN EXITOSO
+            // LOGIN EXITOSO (Status 200)
             const data = await resp.json();
             localStorage.setItem("jwt-token", data.token);
-            
-            // Actualizamos el estado global
             dispatch({ type: "LOGIN", payload: data.token });
-            dispatch({ type: "SET_MESSAGE", payload: "✅ ¡Sesión iniciada con éxito!" });
-
-            // CERRAMOS EL MODAL AUTOMÁTICAMENTE TRAS EL ÉXITO
+            dispatch({ type: "SET_MESSAGE", payload: { text: "¡Sesión iniciada!", status: 200 } });
+            // CERRAMOS EL MODAL Y LIMPIAMOS TODO
             setTimeout(() => {
-                const closeBtn = document.getElementById(`close-${id}`);
+                const closeBtn = document.getElementById("finalizar-login");
                 if (closeBtn) closeBtn.click();
-                dispatch({ type: "SET_MESSAGE", payload: null });
-            }, 1500);
 
+                // 1. Limpiamos el mensaje del store
+                dispatch({ type: "SET_MESSAGE", payload: null });
+                // 2. Limpiamos los inputs del formulario (importante)
+                setEmail("");
+                setPassword("");
+            }, 2000);
         } catch (error) {
-            console.error("Error en la petición:", error);
-            dispatch({ 
-                type: "SET_MESSAGE", 
-                payload: "🚀 Error de conexión: Inténtalo de nuevo más tarde." 
-            });
+            dispatch({ type: "SET_MESSAGE", payload: { text: "Error de conexión", status: 500 } });
         }
     };
 
     return (
-        <div className="modal fade" id={id} tabIndex="-1" aria-hidden="true">
+        <div className="modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-hidden="true">
             <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content">
                     <div className="modal-header">
                         <h2 className="modal-title fs-5">Login</h2>
-                        <button 
-                            type="button" 
-                            id={`close-${id}`} 
-                            className="btn-close" 
-                            data-bs-dismiss="modal" 
+                        <button
+                            type="button"
+                            id="finalizar-login"
+                            className="btn-close"
+                            data-bs-dismiss="modal"
                             aria-label="Close"
-                            onClick={() => dispatch({ type: "SET_MESSAGE", payload: null })}
+                            onClick={() => {
+                                dispatch({ type: "SET_MESSAGE", payload: null });
+                                setEmail("");
+                                setPassword("");
+                            }}
                         ></button>
                     </div>
                     <div className="modal-body">
-                        {/* Tu lógica de mensajes */}
-                        {store.message && (
-                            <div className={`alert ${store.message.includes('✅') ? 'alert-success' : 'alert-danger'} p-2`} role="alert">
-                                {store.message}
+                        {store.message ? (
+                            <div className={`alert ${store.message.status >= 200 && store.message.status < 300 ? 'alert-success' : 'alert-danger'} p-2`}>
+                                {store.message.text || store.message}
                             </div>
-                        )}
-
+                        ) : null}
                         <input
                             className="form-control mb-2"
                             type="email"

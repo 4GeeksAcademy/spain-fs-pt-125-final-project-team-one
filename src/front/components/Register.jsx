@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
-// Añadimos { id } para que coincida con el disparador del Navbar
 export const Register = ({ id }) => {
     const { store, dispatch } = useGlobalReducer();
     const [email, setEmail] = useState("");
@@ -10,82 +9,83 @@ export const Register = ({ id }) => {
     const [last_name, setLast_name] = useState("");
 
     const handleRegister = async () => {
-        // Validamos usando dispatch en lugar de alert
         if (!email.trim() || !password.trim() || !name.trim() || !last_name.trim()) {
-            dispatch({ 
-                type: "SET_MESSAGE", 
-                payload: "⚠️ Por favor, rellena todos los campos." 
+            dispatch({
+                type: "SET_MESSAGE",
+                payload: { text: "⚠️ Rellena todos los campos.", status: 400 }
             });
             return;
         }
-
+        if (password.length < 6) {
+            dispatch({
+                type: "SET_MESSAGE",
+                payload: { text: "⚠️ La contraseña debe tener al menos 6 caracteres", status: 400 }
+            });
+            return;
+        }
         try {
             const resp = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    email: email, 
-                    password: password, 
-                    name: name, 
-                    last_name: last_name 
-                })
+                body: JSON.stringify({ email, password, name, last_name })
             });
 
             if (resp.status === 409) {
-                dispatch({ 
-                    type: "SET_MESSAGE", 
-                    payload: "📧 El usuario ya existe, intenta hacer Login." 
+                dispatch({
+                    type: "SET_MESSAGE",
+                    payload: { text: "📧 El usuario ya existe.", status: 409 }
                 });
                 return;
             }
 
             if (resp.ok) {
-                dispatch({ 
-                    type: "SET_MESSAGE", 
-                    payload: "✅ ¡Usuario creado con éxito! Ya puedes loguearte." 
+                dispatch({
+                    type: "SET_MESSAGE",
+                    payload: { text: "✅ ¡Usuario creado con éxito!", status: 201 }
                 });
-                // Limpiar los campos tras éxito
                 setName(""); setLast_name(""); setEmail(""); setPassword("");
 
-                // Opcional: Cerrar el modal automáticamente tras 2 segundos para que vean el mensaje de éxito
                 setTimeout(() => {
-                    const closeBtn = document.getElementById(`close-${id}`);
+                    const closeBtn = document.getElementById("finalizar-registro");
                     if (closeBtn) closeBtn.click();
                     dispatch({ type: "SET_MESSAGE", payload: null });
                 }, 2000);
             }
         } catch (error) {
-            console.error("Error en la petición:", error);
-            dispatch({ 
-                type: "SET_MESSAGE", 
-                payload: "🚀 Error de conexión: Inténtalo más tarde." 
+            dispatch({
+                type: "SET_MESSAGE",
+                payload: { text: "🚀 Error de conexión.", status: 500 }
             });
         }
     };
 
     return (
-        <div className="modal fade" id={id} tabIndex="-1" aria-hidden="true">
+        <div className="modal fade" id="registerModal" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-hidden="true">
             <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content">
                     <div className="modal-header">
                         <h2 className="modal-title fs-5">Registro</h2>
-                        <button 
-                            type="button" 
-                            id={`close-${id}`} 
-                            className="btn-close" 
-                            data-bs-dismiss="modal" 
+                        <button
+                            type="button"
+                            id="finalizar-registro"
+                            className="btn-close"
+                            data-bs-dismiss="modal"
                             aria-label="Close"
-                            onClick={() => dispatch({ type: "SET_MESSAGE", payload: null })}
+                            onClick={() => {
+                                dispatch({ type: "SET_MESSAGE", payload: null });
+                                setName("");
+                                setLast_name("");
+                                setEmail("");
+                                setPassword("");
+                            }}
                         ></button>
                     </div>
                     <div className="modal-body text-start">
-                        {/* Mostramos el mensaje del store si existe */}
-                        {store.message && (
-                            <div className={`alert ${store.message.includes('✅') ? 'alert-success' : 'alert-info'} p-2`} role="alert">
-                                {store.message}
+                        {store.message ? (
+                            <div className={`alert ${store.message.status >= 200 && store.message.status < 300 ? 'alert-success':'alert-danger'} p-2`}>
+                                {store.message.text || store.message}
                             </div>
-                        )}
-
+                        ) : null }
                         <input
                             className="form-control mb-2"
                             type="text"
