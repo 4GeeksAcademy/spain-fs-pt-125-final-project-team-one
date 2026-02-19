@@ -51,6 +51,7 @@ export const Register = ({ id }) => {
                     dispatch({ type: "SET_MESSAGE", payload: null });
                 }, 2000);
             }
+
         } catch (error) {
             dispatch({
                 type: "SET_MESSAGE",
@@ -60,7 +61,7 @@ export const Register = ({ id }) => {
     };
 
     return (
-        <div className="modal fade" id="registerModal" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-hidden="true">
+        <div className="modal fade" id={id} data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1">
             <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content">
                     <div className="modal-header">
@@ -82,10 +83,10 @@ export const Register = ({ id }) => {
                     </div>
                     <div className="modal-body text-start">
                         {store.message ? (
-                            <div className={`alert ${store.message.status >= 200 && store.message.status < 300 ? 'alert-success':'alert-danger'} p-2`}>
+                            <div className={`alert ${store.message.status >= 200 && store.message.status < 300 ? 'alert-success' : 'alert-danger'} p-2`}>
                                 {store.message.text || store.message}
                             </div>
-                        ) : null }
+                        ) : null}
                         <input
                             className="form-control mb-2"
                             type="text"

@@ -39,29 +39,27 @@ export const Login = ({ id }) => {
                 dispatch({ type: "SET_MESSAGE", payload: { text: "Error de servidor", status: resp.status } });
                 return;
             }
-            // LOGIN EXITOSO (Status 200)
+
             const data = await resp.json();
             localStorage.setItem("jwt-token", data.token);
             dispatch({ type: "LOGIN", payload: data.token });
             dispatch({ type: "SET_MESSAGE", payload: { text: "¡Sesión iniciada!", status: 200 } });
-            // CERRAMOS EL MODAL Y LIMPIAMOS TODO
+
             setTimeout(() => {
                 const closeBtn = document.getElementById("finalizar-login");
                 if (closeBtn) closeBtn.click();
-
-                // 1. Limpiamos el mensaje del store
                 dispatch({ type: "SET_MESSAGE", payload: null });
-                // 2. Limpiamos los inputs del formulario (importante)
                 setEmail("");
                 setPassword("");
             }, 2000);
+
         } catch (error) {
             dispatch({ type: "SET_MESSAGE", payload: { text: "Error de conexión", status: 500 } });
         }
     };
 
     return (
-        <div className="modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-hidden="true">
+        <div className="modal fade" id={id} data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1">
             <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content">
                     <div className="modal-header">

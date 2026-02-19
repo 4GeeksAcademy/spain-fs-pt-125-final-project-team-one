@@ -48,6 +48,7 @@ def create_token():
     body = request.get_json(silent=True)
     if not body:
         return jsonify({"msg": "Cuerpo faltante"}), 400
+    
 
     email = body.get("email")
     password = body.get("password")
