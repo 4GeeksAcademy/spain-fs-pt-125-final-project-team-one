@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 export const Register = ({ id }) => {
+    
     const { store, dispatch } = useGlobalReducer();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -12,14 +13,14 @@ export const Register = ({ id }) => {
         if (!email.trim() || !password.trim() || !name.trim() || !last_name.trim()) {
             dispatch({
                 type: "SET_MESSAGE",
-                payload: { text: "⚠️ Rellena todos los campos.", status: 400 }
+                payload: { msg: "⚠️ Rellena todos los campos.", status: 400 }
             });
             return;
         }
         if (password.length < 6) {
             dispatch({
                 type: "SET_MESSAGE",
-                payload: { text: "⚠️ La contraseña debe tener al menos 6 caracteres", status: 400 }
+                payload: { msg: "⚠️ La contraseña debe tener al menos 6 caracteres", status: 400 }
             });
             return;
         }
@@ -33,7 +34,7 @@ export const Register = ({ id }) => {
             if (resp.status === 409) {
                 dispatch({
                     type: "SET_MESSAGE",
-                    payload: { text: "📧 El usuario ya existe.", status: 409 }
+                    payload: { msg: "📧 El usuario ya existe.", status: 409 }
                 });
                 return;
             }
@@ -41,7 +42,7 @@ export const Register = ({ id }) => {
             if (resp.ok) {
                 dispatch({
                     type: "SET_MESSAGE",
-                    payload: { text: "✅ ¡Usuario creado con éxito!", status: 201 }
+                    payload: { msg: "✅ ¡Usuario creado con éxito!", status: 201 }
                 });
                 setName(""); setLast_name(""); setEmail(""); setPassword("");
 
@@ -55,7 +56,7 @@ export const Register = ({ id }) => {
         } catch (error) {
             dispatch({
                 type: "SET_MESSAGE",
-                payload: { text: "🚀 Error de conexión.", status: 500 }
+                payload: { msg: "🚀 Error de conexión.", status: 500 }
             });
         }
     };
@@ -84,7 +85,7 @@ export const Register = ({ id }) => {
                     <div className="modal-body text-start">
                         {store.message ? (
                             <div className={`alert ${store.message.status >= 200 && store.message.status < 300 ? 'alert-success' : 'alert-danger'} p-2`}>
-                                {store.message.text || store.message}
+                                {store.message.msg || store.message}
                             </div>
                         ) : null}
                         <input

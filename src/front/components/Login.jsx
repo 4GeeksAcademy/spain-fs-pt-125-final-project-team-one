@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 export const Login = ({ id }) => {
+    
     const { store, dispatch } = useGlobalReducer();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -13,14 +14,14 @@ export const Login = ({ id }) => {
         if (!email.trim() || !password.trim()) {
             dispatch({
                 type: "SET_MESSAGE",
-                payload: { text: "⚠️ Los campos están vacíos", status: 400 }
+                payload: { msg: "⚠️ Los campos están vacíos", status: 400 }
             });
             return;
         }
         if (password.length < 6) {
             dispatch({
                 type: "SET_MESSAGE",
-                payload: { text: "⚠️ La contraseña debe tener al menos 6 caracteres", status: 400 }
+                payload: { msg: "⚠️ La contraseña debe tener al menos 6 caracteres", status: 400 }
             });
             return;
         }
@@ -32,18 +33,18 @@ export const Login = ({ id }) => {
                 body: JSON.stringify({ email, password })
             });
             if (resp.status === 401) {
-                dispatch({ type: "SET_MESSAGE", payload: { text: "Email o contraseña incorrectos", status: 401 } });
+                dispatch({ type: "SET_MESSAGE", payload: { msg: "Email o contraseña incorrectos", status: 401 } });
                 return;
             }
             if (!resp.ok) {
-                dispatch({ type: "SET_MESSAGE", payload: { text: "Error de servidor", status: resp.status } });
+                dispatch({ type: "SET_MESSAGE", payload: { msg: "Error de servidor", status: resp.status } });
                 return;
             }
 
             const data = await resp.json();
             localStorage.setItem("jwt-token", data.token);
             dispatch({ type: "LOGIN", payload: data.token });
-            dispatch({ type: "SET_MESSAGE", payload: { text: "¡Sesión iniciada!", status: 200 } });
+            dispatch({ type: "SET_MESSAGE", payload: { msg: "¡Sesión iniciada!", status: 200 } });
 
             setTimeout(() => {
                 const closeBtn = document.getElementById("finalizar-login");
@@ -54,7 +55,7 @@ export const Login = ({ id }) => {
             }, 2000);
 
         } catch (error) {
-            dispatch({ type: "SET_MESSAGE", payload: { text: "Error de conexión", status: 500 } });
+            dispatch({ type: "SET_MESSAGE", payload: { msg: "Error de conexión", status: 500 } });
         }
     };
 
@@ -80,7 +81,7 @@ export const Login = ({ id }) => {
                     <div className="modal-body">
                         {store.message ? (
                             <div className={`alert ${store.message.status >= 200 && store.message.status < 300 ? 'alert-success' : 'alert-danger'} p-2`}>
-                                {store.message.text || store.message}
+                                {store.message.msg || store.message}
                             </div>
                         ) : null}
                         <input

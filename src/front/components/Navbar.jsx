@@ -5,17 +5,14 @@ import { Login } from "./Login";
 import { Register } from "./Register";
 
 export const Navbar = () => {
+    
     const { store, dispatch } = useGlobalReducer();
     const navigate = useNavigate();
 
     const handleLogout = () => {
         localStorage.removeItem("jwt-token");
-        dispatch({ type: "LOGOUT" });
 
-        dispatch({
-            type: "SET_MESSAGE",
-            payload: { text: "👋 ¡Sesión cerrada con éxito!", status: 200 }
-        });
+        dispatch({ type: "LOGOUT" });
 
         setTimeout(() => {
             dispatch({ type: "SET_MESSAGE", payload: null });
@@ -23,6 +20,7 @@ export const Navbar = () => {
 
         navigate("/");
     };
+
 
     return (
         <>
@@ -95,7 +93,7 @@ export const Navbar = () => {
             <div className="container mt-2">
                 {store.message ? (
                     <div className={`alert ${store.message.status >= 200 && store.message.status < 300 ? 'alert-success' : 'alert-danger'} p-2 text-center`}>
-                        {store.message.text || store.message}
+                        {store.message.msg || store.message}
                     </div>
                 ) : null}
             </div>
