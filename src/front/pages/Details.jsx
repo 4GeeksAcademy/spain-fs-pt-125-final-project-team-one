@@ -17,6 +17,7 @@ export const Details = () => {
     const tvContainerId = `tv-widget-${product?.id ?? productIndex}`;
     const tvScriptRef = useRef(null);
     const [addingPortfolio, setAddingPortfolio] = useState(false);
+    const [quantity, setQuantity] = useState(1);
     // Validar que el índice existe
     if (isNaN(productIndex) || productIndex < 0 || productIndex >= products.length) {
         return (
@@ -38,7 +39,7 @@ export const Details = () => {
         }
 
         setAddingPortfolio(true);
-
+        const total_price_spent = quantity * (product.current_price ?? 0);
         try {
             const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
             const response = await fetch(`${backendUrl}/api/user/portfolio`, {
@@ -47,7 +48,7 @@ export const Details = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({ product_id: product.id }),
+                body: JSON.stringify({ product_id: product.id, amount: quantity, total_price_spent: total_price_spent }),
             });
 
             if (!response.ok) {
@@ -269,6 +270,38 @@ export const Details = () => {
                                     <p className="text-muted small">Última actualización: {coin?.last_updated ?? 'N/A'}</p>
 
                                     <div className="mt-3">
+                                        <div className="mb-3">
+                                            <div className="d-flex justify-content-between align-items-center mb-1">
+                                                <div className='d-flex align-items-center gap-2'>
+                                                <label htmlFor="quantitySlider" className="form-label">
+                                                    Cantidad a agregar:
+                                                </label>
+                                                
+                                                    <input
+                                                        type="number"
+                                                        className="form-control form-control-sm"
+                                                        style={{ width: "100px" }}
+                                                        min="0.01"
+                                                        max="1000"
+                                                        step="0.01"
+                                                        value={quantity}
+                                                        onChange={(e) => setQuantity(parseFloat(e.target.value) || 0)}
+                                                    /></div>
+                                                    <strong>{(quantity * (product.current_price ?? 0)).toFixed(2)} $</strong>
+                                                
+                                            </div>
+                                            <input
+                                                type="range"
+                                                className="form-range"
+                                                id="quantitySlider"
+                                                min="0.01"
+                                                max="1000"
+                                                step="0.01"
+                                                value={quantity}
+                                                onChange={(e) => setQuantity(parseFloat(e.target.value))}
+                                            />
+
+                                        </div>
                                         <button
                                             className="btn btn-primary me-2"
                                             onClick={handleAddPortfolioClick}

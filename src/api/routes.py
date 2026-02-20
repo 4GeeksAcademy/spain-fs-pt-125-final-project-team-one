@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Portfolio
+from api.models import db, User, Portfolio, Operations
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
@@ -115,6 +115,8 @@ def add_to_portfolio():
         return jsonify({"msg": "Cuerpo faltante o JSON inválido"}), 400
 
     product_id = body.get("product_id")
+    amount = body.get("amount", 0)  # Default a 0 si no se proporciona
+    total_price_spent = body.get("total_price_spent")
     if product_id is None:
         return jsonify({"msg": "product_id es obligatorio"}), 400
 
@@ -126,10 +128,26 @@ def add_to_portfolio():
     # Crear nuevo portfolio entry
     new_portfolio = Portfolio(user_id=user_id, product=product_id)
     db.session.add(new_portfolio)
+    db.session.flush()  # Para obtener el ID del portfolio
+
+    # Crear operación con la cantidad
+    new_operation = Operations(
+        portfolio_id=new_portfolio.id,
+        product=product_id,
+        amount=amount,
+        total_price_spent= total_price_spent,
+        bought=False
+    )
+    db.session.add(new_operation)
     db.session.commit()
 
     return jsonify({
         "msg": "Producto agregado al portfolio",
         "portfolio_id": new_portfolio.id,
-        "product": new_portfolio.product
+        "product": new_portfolio.product,
+        "operations": {
+            "id": new_operation.id,
+            "amount": new_operation.amount,
+            "bought": new_operation.bought
+        }
     }), 201
