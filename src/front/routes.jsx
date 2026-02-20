@@ -11,6 +11,7 @@ import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
 import { Perfil } from "./pages/Perfil.jsx"
 import { Market } from "./pages/Market";
+import Details from "./pages/Details";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -25,10 +26,11 @@ export const router = createBrowserRouter(
 
       {/* Nested Routes: Defines sub-routes within the BaseHome component. */}
       <Route path="/" element={<Home />} />
-      <Route path="/perfil" element={<Perfil />} />
       <Route path="/single/:theId" element={<Single />} />  {/* Dynamic route for single items */}
       <Route path="/demo" element={<Demo />} />
-      <Route path="/market" element={<Market/>}/>
+      <Route path="/market" element={<Market />} />
+      <Route path="/market/:index" element={<Details />} />
+      <Route path="/perfil" element={<Perfil />} />
     </Route>
   )
 );

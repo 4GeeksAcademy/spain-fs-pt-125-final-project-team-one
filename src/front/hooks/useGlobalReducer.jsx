@@ -13,7 +13,7 @@ export function StoreProvider({ children }) {
     const [store, dispatch] = useReducer(storeReducer, initialStore())
     useEffect(() => {
         const fetchData = async () => {
-            const options = { method: 'GET', headers: { 'x-cg-demo-api-key': 'Pon Aqui la Api Key' } };
+            const options = { method: 'GET', headers: { 'x-cg-demo-api-key': 'CG-zEzVoDknRQgmq3QKL5wFqXh3' } };
 
             try {
                 dispatch({ type: 'API_LOADING' });
