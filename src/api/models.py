@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 
 db = SQLAlchemy()
 
+
 class User(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, unique=True)
     email: Mapped[str] = mapped_column(
@@ -15,7 +16,7 @@ class User(db.Model):
     last_name: Mapped[str] = mapped_column(String(120), nullable=False)
     favorites_array = Column(ARRAY(Integer), nullable=False, default=list)
     cash: Mapped[int] = mapped_column(nullable=True)
-    is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False, default=True)
     portfolio: Mapped["Portfolio"] = relationship(back_populates="user")
 
     def serialize(self):
@@ -24,7 +25,7 @@ class User(db.Model):
             "email": self.email,
             "name": self.name,
             "last_name": self.last_name,
-            "favourites": self.favorites_array,
+            "favorites": self.favorites_array,
             "is_active": self.is_active
             # do not serialize the password, its a security breach
         }

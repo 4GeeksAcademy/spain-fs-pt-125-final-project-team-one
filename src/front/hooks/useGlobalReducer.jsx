@@ -1,5 +1,5 @@
 // Import necessary hooks and functions from React.
-import { useContext, useReducer, createContext } from "react";
+import { useContext, useReducer, createContext, useEffect } from "react";
 import storeReducer, { initialStore } from "../store"  // Import the reducer and the initial state.
 
 // Create a context to hold the global state of the application
@@ -11,6 +11,36 @@ const StoreContext = createContext()
 export function StoreProvider({ children }) {
     // Initialize reducer with the initial state.
     const [store, dispatch] = useReducer(storeReducer, initialStore())
+    useEffect(() => {
+        const fetchData = async () => {
+            const options = { method: 'GET', headers: { 'x-cg-demo-api-key': 'Pon Aqui la Api Key' } };
+
+            try {
+                dispatch({ type: 'API_LOADING' });
+
+                const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd', options);
+                if (!response.ok) {
+                    throw new Error('Error en la API');
+                }
+
+                const result = await response.json();
+                dispatch({
+                    type: 'API_SUCCESS',
+                    payload: result
+                });
+            } catch (err) {
+                dispatch({
+                    type: 'API_ERROR',
+                    payload: err.message
+                });
+            }
+        };
+
+        fetchData();
+    }, [dispatch]);
+    if (store.api.loading) return <p>Cargando...</p>;
+    if (store.api.error) return <p>Error: {store.api.error}</p>;
+    
     // Provide the store and dispatch method to all child components.
     return <StoreContext.Provider value={{ store, dispatch }}>
         {children}
@@ -19,6 +49,11 @@ export function StoreProvider({ children }) {
 
 // Custom hook to access the global state and dispatch function.
 export default function useGlobalReducer() {
-    const { dispatch, store } = useContext(StoreContext)
+    const context = useContext(StoreContext)
+    if (!context) {
+        throw new Error('useGlobalReducer must be used within StoreProvider');
+    }
+    const { dispatch, store } = context
     return { dispatch, store };
 }
+
