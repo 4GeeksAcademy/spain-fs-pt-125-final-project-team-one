@@ -9,6 +9,7 @@ import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
+import { Perfil } from "./pages/Perfil.jsx"
 import { Market } from "./pages/Market";
 import Details from "./pages/Details";
 
@@ -29,6 +30,7 @@ export const router = createBrowserRouter(
       <Route path="/demo" element={<Demo />} />
       <Route path="/market" element={<Market />} />
       <Route path="/market/:index" element={<Details />} />
+      <Route path="/perfil" element={<Perfil />} />
     </Route>
   )
 );

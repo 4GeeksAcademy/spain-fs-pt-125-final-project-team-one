@@ -7,7 +7,8 @@ from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from sqlalchemy import select
-from flask_bcrypt import Bcrypt
+import os
+from flask_bcrypt import Bcrypt 
 
 api = Blueprint('api', __name__)
 bcrypt = Bcrypt()
@@ -50,6 +51,7 @@ def create_token():
     body = request.get_json(silent=True)
     if not body:
         return jsonify({"msg": "Cuerpo faltante"}), 400
+    
 
     email = body.get("email")
     password = body.get("password")
