@@ -30,10 +30,9 @@ export const Details = () => {
     }
 
     const handleAddPortfolioClick = async () => {
-        const token = localStorage.getItem('access_token');
-        const userId = localStorage.getItem('user_id');
+        const token = store.token || localStorage.getItem('jwt-token');
 
-        if (!token || !userId) {
+        if (!token ) {
             alert('Por favor inicia sesión para agregar al portfolio');
             return;
         }
@@ -66,10 +65,10 @@ export const Details = () => {
     };
 
     const handleFavoriteClick = async () => {
-        const token = localStorage.getItem('access_token');
-        const userId = localStorage.getItem('user_id');
+        const token = store.token || localStorage.getItem('jwt-token');
+        
 
-        if (!token || !userId) {
+        if (!token) {
             alert('Por favor inicia sesión para agregar favoritos');
             return;
         }
@@ -85,11 +84,12 @@ export const Details = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({ product_id: product.id }),
+                body: JSON.stringify({ product_id: product.id}),
             });
 
             if (!response.ok) {
-                throw new Error('Error al guardar favorito');
+                const data = await response.json();
+                throw new Error(data.msg || 'Error al guardar favorito');
             }
 
             const data = await response.json();

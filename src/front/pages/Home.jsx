@@ -6,32 +6,6 @@ export const Home = () => {
 
 	const { store, dispatch } = useGlobalReducer()
 
-	const loadMessage = async () => {
-		try {
-			const backendUrl = import.meta.env.VITE_BACKEND_URL
-
-			if (!backendUrl) throw new Error("VITE_BACKEND_URL is not defined in .env file")
-
-			const response = await fetch(backendUrl + "/api/hello")
-			const data = await response.json()
-
-			if (response.ok) dispatch({ type: "set_hello", payload: data.message })
-
-			return data
-
-		} catch (error) {
-			if (error.message) throw new Error(
-				`Could not fetch the message from the backend.
-				Please check if the backend is running and the backend port is public.`
-			);
-		}
-
-	}
-
-	useEffect(() => {
-		loadMessage()
-	}, [])
-
 	return (
 		<div>
 			<div className="bg-primary text-white py-5 text-center">
@@ -57,11 +31,6 @@ export const Home = () => {
 						<p className="lead text-muted">
 							Una herramienta simple y poderosa para gestionar tus inversiones.
 						</p>
-						{store.message && (
-							<div className="alert alert-info mt-3">
-								<span>{store.message}</span>
-							</div>
-						)}
 					</div>
 				</div>
 				<div className="row mb-4">

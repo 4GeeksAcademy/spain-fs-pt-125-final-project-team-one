@@ -5,7 +5,7 @@ import { Login } from "./Login";
 import { Register } from "./Register";
 
 export const Navbar = () => {
-    
+
     const { store, dispatch } = useGlobalReducer();
     const navigate = useNavigate();
 
@@ -58,6 +58,7 @@ export const Navbar = () => {
                                         </ul>
                                     </li>
                                 </ul>
+                                
                                 <form className="d-flex me-3" role="search">
                                     <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
                                     <button className="btn btn-outline-success" type="submit">Buscar</button>
@@ -91,7 +92,7 @@ export const Navbar = () => {
             </nav>
 
             <div className="container mt-2">
-                {store.message ? (
+                {store.message && store.message.status >= 200 && store.message.status < 300 ? (
                     <div className={`alert ${store.message.status >= 200 && store.message.status < 300 ? 'alert-success' : 'alert-danger'} p-2 text-center`}>
                         {store.message.msg || store.message}
                     </div>
