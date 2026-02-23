@@ -69,6 +69,117 @@ def create_token():
 
     return jsonify({"token": access_token, "user_id": user.id, "msg": "Login exitoso"}), 200
 
+@api.route("/user/profile", methods=["GET"])
+@jwt_required()
+def get_user_profile():
+    try:
+        current_user_id = get_jwt_identity()
+        
+        user = db.session.execute(
+            select(User).where(User.id == int(current_user_id))
+        ).scalar_one_or_none()
+        
+        if not user:
+            return jsonify({"msg": "Usuario no encontrado"}), 404
+        
+        return jsonify(user.serialize()), 200
+        
+    except Exception as e:
+        return jsonify({"msg": "Error al obtener perfil", "error": str(e)}), 500
+    
+
+@api.route("/user/profile", methods=["PUT"])
+@jwt_required()
+def update_user_profile():
+    try:
+        
+        current_user_id = get_jwt_identity()
+        
+        body = request.get_json(silent=True)
+        if not body:
+            return jsonify({"msg": "Cuerpo faltante"}), 400
+        
+        name = body.get("name")
+        last_name = body.get("last_name")
+        email = body.get("email")
+        
+        if not name or not last_name or not email:
+            return jsonify({"msg": "Todos los campos son obligatorios"}), 400
+        
+        user = db.session.execute(
+            select(User).where(User.id == int(current_user_id))
+        ).scalar_one_or_none()
+        
+        if not user:
+            return jsonify({"msg": "Usuario no encontrado"}), 404
+        
+
+        if email != user.email:
+            existing_user = db.session.execute(
+                select(User).where(User.email == email)
+            ).scalar_one_or_none()
+            
+            if existing_user:
+                return jsonify({"msg": "El email ya está en uso"}), 409
+        
+
+        user.name = name
+        user.last_name = last_name
+        user.email = email
+        
+        db.session.commit()
+        
+
+        return jsonify(user.serialize()), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al actualizar perfil", "error": str(e)}), 500
+       
+
+@api.route("/user/change-password", methods=["PUT"])
+@jwt_required()
+def change_password():
+    try:
+        current_user_id = get_jwt_identity()
+        
+        body = request.get_json(silent=True)
+        if not body:
+            return jsonify({"msg": "Cuerpo faltante"}), 400
+        
+        current_password = body.get("current_password")
+        new_password = body.get("new_password")
+        
+        if not current_password or not new_password:
+            return jsonify({"msg": "Contraseña actual y nueva son obligatorias"}), 400
+        
+        if len(new_password) < 6:
+            return jsonify({"msg": "La nueva contraseña debe tener al menos 6 caracteres"}), 400
+        
+        user = db.session.execute(
+            select(User).where(User.id == int(current_user_id))
+        ).scalar_one_or_none()
+        
+        if not user:
+            return jsonify({"msg": "Usuario no encontrado"}), 404
+        
+        if not bcrypt.check_password_hash(user.password, current_password):
+            return jsonify({"msg": "Contraseña actual incorrecta"}), 401
+        
+        if bcrypt.check_password_hash(user.password, new_password):
+            return jsonify({"msg": "La nueva contraseña debe ser diferente a la actual"}), 400
+        
+        hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+        
+        user.password = hashed_password
+        db.session.commit()
+        
+        return jsonify({"msg": "Contraseña cambiada con éxito"}), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al cambiar contraseña", "error": str(e)}), 500    
+
 
 @api.route("/user/favorites", methods=["POST"])
 @jwt_required()
