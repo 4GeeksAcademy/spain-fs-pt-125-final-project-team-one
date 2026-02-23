@@ -52,7 +52,7 @@ export const Login = ({ id }) => {
                 dispatch({ type: "SET_MESSAGE", payload: null });
                 setEmail("");
                 setPassword("");
-            }, 2000);
+            }, 500);
 
         } catch (error) {
             dispatch({ type: "SET_MESSAGE", payload: { msg: "Error de conexión", status: 500 } });

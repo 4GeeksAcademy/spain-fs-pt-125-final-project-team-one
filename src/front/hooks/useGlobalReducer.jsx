@@ -1,7 +1,7 @@
 // Import necessary hooks and functions from React.
 import { useContext, useReducer, createContext, useEffect } from "react";
 import storeReducer, { initialStore } from "../store"  // Import the reducer and the initial state.
-
+import { Navbar } from "../components/Navbar.jsx";  // Import the logout function to handle unauthorized access.
 // Create a context to hold the global state of the application
 // We will call this global state the "store" to avoid confusion while using local states
 const StoreContext = createContext()
@@ -11,8 +11,28 @@ const StoreContext = createContext()
 export function StoreProvider({ children }) {
     // Initialize reducer with the initial state.
     const [store, dispatch] = useReducer(storeReducer, initialStore())
+
     useEffect(() => {
+
         const fetchData = async () => {
+
+            try{
+                const userresponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/user/perfil`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                if (userresponse.status === 401) {
+                    Navbar.handleLogout();
+                    console.warn('Token inválido o expirado. Cerrando sesión.');
+                    
+                }
+            } catch (error) {
+                console.error('Error al obtener perfil del usuario:', error);
+            }
+
             const options = { method: 'GET', headers: { 'x-cg-demo-api-key': 'CG-zEzVoDknRQgmq3QKL5wFqXh3' } };
 
             try {
@@ -40,7 +60,7 @@ export function StoreProvider({ children }) {
     }, [dispatch]);
     if (store.api.loading) return <p>Cargando...</p>;
     if (store.api.error) return <p>Error: {store.api.error}</p>;
-    
+
     // Provide the store and dispatch method to all child components.
     return <StoreContext.Provider value={{ store, dispatch }}>
         {children}

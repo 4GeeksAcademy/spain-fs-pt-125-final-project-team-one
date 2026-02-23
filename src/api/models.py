@@ -16,6 +16,7 @@ class User(db.Model):
     last_name: Mapped[str] = mapped_column(String(120), nullable=False)
     favorites_array = Column(MutableList.as_mutable(ARRAY(String)), nullable=False, default=list)
     cash: Mapped[int] = mapped_column(nullable=True)
+    image_url: Mapped[str] = mapped_column(String(300), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False, default=True)
     portfolio: Mapped["Portfolio"] = relationship(back_populates="user")
 

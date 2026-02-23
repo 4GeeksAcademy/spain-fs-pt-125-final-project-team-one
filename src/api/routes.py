@@ -8,14 +8,14 @@ from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from sqlalchemy import select
 import os
-from flask_bcrypt import Bcrypt 
+from flask_bcrypt import Bcrypt
+from datetime import timedelta
 
 api = Blueprint('api', __name__)
 bcrypt = Bcrypt()
 
 # Allow CORS requests to this API
 CORS(api)
-
 
 @api.route("/register", methods=["POST"])
 def handle_register():
@@ -51,7 +51,6 @@ def create_token():
     body = request.get_json(silent=True)
     if not body:
         return jsonify({"msg": "Cuerpo faltante"}), 400
-    
 
     email = body.get("email")
     password = body.get("password")
@@ -65,7 +64,9 @@ def create_token():
     if not user.is_active:
         return jsonify({"msg": "Usuario inactivo"}), 403
 
-    access_token = create_access_token(identity=str(user.id))
+    access_token = create_access_token(
+        identity=str(user.id),
+        expires_delta=timedelta(seconds=10))
 
     return jsonify({"token": access_token, "user_id": user.id, "msg": "Login exitoso"}), 200
 
@@ -137,7 +138,7 @@ def add_to_portfolio():
         portfolio_id=new_portfolio.id,
         product=product_id,
         amount=amount,
-        total_price_spent= total_price_spent,
+        total_price_spent=total_price_spent,
         bought=False
     )
     db.session.add(new_operation)
