@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import String, ForeignKey, DateTime, Boolean, ARRAY, Column, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime, timezone
-
+from sqlalchemy.ext.mutable import MutableList
 
 db = SQLAlchemy()
 
@@ -14,7 +14,7 @@ class User(db.Model):
     password: Mapped[str] = mapped_column(String(300), nullable=False)
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     last_name: Mapped[str] = mapped_column(String(120), nullable=False)
-    favorites_array = Column(ARRAY(Integer), nullable=False, default=list)
+    favorites_array = Column(MutableList.as_mutable(ARRAY(String)), nullable=False, default=list)
     cash: Mapped[int] = mapped_column(nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False, default=True)
     portfolio: Mapped["Portfolio"] = relationship(back_populates="user")
@@ -35,7 +35,7 @@ class Portfolio(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, unique=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     user: Mapped["User"] = relationship(back_populates="portfolio")
-    product: Mapped[int] = mapped_column(nullable=False)
+    product: Mapped[str] = mapped_column(nullable=False)
     date: Mapped[datetime] = mapped_column(
         DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     operations: Mapped["Operations"] = relationship(back_populates="portfolio")
@@ -53,7 +53,7 @@ class Operations(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, unique=True)
     portfolio_id: Mapped[int] = mapped_column(ForeignKey("portfolio.id"))
     portfolio: Mapped["Portfolio"] = relationship(back_populates="operations")
-    product: Mapped[int] = mapped_column(nullable=False)
+    product: Mapped[str] = mapped_column(nullable=False)
     date: Mapped[datetime] = mapped_column(
         DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     total_price_spent: Mapped[float] = mapped_column(nullable=True)

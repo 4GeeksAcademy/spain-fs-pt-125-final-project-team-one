@@ -150,6 +150,7 @@ def add_to_portfolio():
         "operations": {
             "id": new_operation.id,
             "amount": new_operation.amount,
-            "bought": new_operation.bought
+            "bought": new_operation.bought,
+            "total_price_spent": new_operation.total_price_spent
         }
     }), 201

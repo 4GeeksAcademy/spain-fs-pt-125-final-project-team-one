@@ -31,7 +31,7 @@ export default function storeReducer(store, action = {}) {
       return {
         ...store,
         message: action.payload,
-    
+      };
     case "API_LOADING":
       return {
         ...store,
