@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, Link } from "react"
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 export const ChangePassword = () => {
@@ -136,11 +136,11 @@ export const ChangePassword = () => {
 										name="newPassword"
 										value={formData.newPassword}
 										onChange={handleChange}
-										placeholder="Mínimo 6 caracteres"
+										placeholder="Mínimo 8 caracteres"
 										required
 									/>
 									<small className="text-muted">
-										Debe tener al menos 6 caracteres
+										Debe tener al menos 8 caracteres
 									</small>
 								</div>
 
@@ -178,9 +178,9 @@ export const ChangePassword = () => {
 											</>
 										)}
 									</button>
-									<a href="/perfil" className="btn btn-outline-secondary">
+									<Link to="/perfil" className="btn btn-outline-secondary">
 										Cancelar
-									</a>
+									</Link>
 								</div>
 							</form>
 						</div>

@@ -148,7 +148,7 @@ export const Perfil = () => {
 		return (
 			<div className="container py-5 text-center">
 				<div className="alert alert-danger">{error}</div>
-				<a href="/" className="btn btn-primary">Ir a Inicio</a>
+				<Link to="/" className="btn btn-primary">Ir a Inicio</Link>
 			</div>
 		)
 	}
@@ -199,9 +199,9 @@ export const Perfil = () => {
 										>
 											<i className="bi bi-pencil"></i> Editar Perfil
 										</button>
-										<a href="/change-password" className="btn btn-warning me-2 mb-2">
+										<Link to="/change-password" className="btn btn-warning me-2 mb-2">
 											<i className="bi bi-key"></i> Cambiar Contraseña
-										</a>
+										</Link>
 									</div>
 								</div>
 							</div>
