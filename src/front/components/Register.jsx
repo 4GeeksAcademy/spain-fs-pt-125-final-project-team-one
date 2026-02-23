@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 export const Register = ({ id }) => {
-    
+
     const { store, dispatch } = useGlobalReducer();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -10,17 +10,28 @@ export const Register = ({ id }) => {
     const [last_name, setLast_name] = useState("");
 
     const handleRegister = async () => {
+        const tieneLetra = /[a-zA-Z]/.test(password);
+        const tieneNumero = /[0-9]/.test(password);
+
+
         if (!email.trim() || !password.trim() || !name.trim() || !last_name.trim()) {
             dispatch({
                 type: "SET_MESSAGE",
                 payload: { msg: "⚠️ Rellena todos los campos.", status: 400 }
             });
             return;
-        }
-        if (password.length < 6) {
+        }     
+        if (password.length < 8) {
             dispatch({
                 type: "SET_MESSAGE",
-                payload: { msg: "⚠️ La contraseña debe tener al menos 6 caracteres", status: 400 }
+                payload: { msg: "⚠️ La contraseña debe tener al menos 8 caracteres", status: 400 }
+            });
+            return;
+        }
+        if (!tieneLetra || !tieneNumero) {
+            dispatch({
+                type: "SET_MESSAGE",
+                payload: { msg: "⚠️ La contraseña debe contener al menos una letra y un número.", status: 400 }
             });
             return;
         }
@@ -50,7 +61,7 @@ export const Register = ({ id }) => {
                     const closeBtn = document.getElementById("finalizar-registro");
                     if (closeBtn) closeBtn.click();
                     dispatch({ type: "SET_MESSAGE", payload: null });
-                }, 2000);
+                }, 500);
             }
 
         } catch (error) {

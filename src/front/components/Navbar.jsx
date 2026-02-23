@@ -16,7 +16,7 @@ export const Navbar = () => {
 
         setTimeout(() => {
             dispatch({ type: "SET_MESSAGE", payload: null });
-        }, 3000);
+        }, 1000);
 
         navigate("/");
     };
@@ -35,9 +35,6 @@ export const Navbar = () => {
                             </button>
                             <div className="collapse navbar-collapse" id="navbarSupportedContent">
                                 <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                                    <li className="nav-item">
-                                        <Link className="nav-link active" to="/">Home</Link>
-                                    </li>
                                     <li className="nav-item">
                                         <Link className="nav-link" to="/market">Lista de activos</Link>
                                     </li>
