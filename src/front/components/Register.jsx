@@ -61,7 +61,7 @@ export const Register = ({ id }) => {
                     const closeBtn = document.getElementById("finalizar-registro");
                     if (closeBtn) closeBtn.click();
                     dispatch({ type: "SET_MESSAGE", payload: null });
-                }, 500);
+                }, 1000);
             }
 
         } catch (error) {
