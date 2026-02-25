@@ -240,7 +240,7 @@ def add_to_portfolio():
         return jsonify({"msg": "Usuario no encontrado"}), 404
 
     # Crear nuevo portfolio entry
-    new_portfolio = Portfolio(user_id=user_id, product=product_id)
+    new_portfolio = Portfolio(user_id=user_id, product=product_id, amount=amount)
     db.session.add(new_portfolio)
     db.session.flush()  # Para obtener el ID del portfolio
 
@@ -258,6 +258,7 @@ def add_to_portfolio():
     return jsonify({
         "msg": "Producto agregado al portfolio",
         "portfolio_id": new_portfolio.id,
+        "amount": amount,
         "product": new_portfolio.product,
         "operations": {
             "id": new_operation.id,
