@@ -37,6 +37,7 @@ class Portfolio(db.Model):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     user: Mapped["User"] = relationship(back_populates="portfolio")
     product: Mapped[str] = mapped_column(nullable=False)
+    amount: Mapped[float] = mapped_column(nullable=False)
     date: Mapped[datetime] = mapped_column(
         DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     operations: Mapped["Operations"] = relationship(back_populates="portfolio")
