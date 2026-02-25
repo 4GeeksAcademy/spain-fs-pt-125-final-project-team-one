@@ -1,7 +1,7 @@
 // Import necessary hooks and functions from React.
 import { useContext, useReducer, createContext, useEffect } from "react";
 import storeReducer, { initialStore } from "../store"  // Import the reducer and the initial state.
-import { Navbar } from "../components/Navbar.jsx";  // Import the logout function to handle unauthorized access.
+// Import the logout function to handle unauthorized access.
 // Create a context to hold the global state of the application
 // We will call this global state the "store" to avoid confusion while using local states
 const StoreContext = createContext()
@@ -12,27 +12,40 @@ export function StoreProvider({ children }) {
     // Initialize reducer with the initial state.
     const [store, dispatch] = useReducer(storeReducer, initialStore())
 
+    const handleLogout = () => {
+        localStorage.removeItem("jwt-token");
+
+        dispatch({ type: "LOGOUT" });
+
+        setTimeout(() => {
+            dispatch({ type: "SET_MESSAGE", payload: null });
+        }, 1000);
+
+
+    };
+
+
     useEffect(() => {
 
         const fetchData = async () => {
+            if (store.token) {
+                try {
+                    const userresponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/user/profile`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('jwt-token')}`
+                        }
+                    });
+                    if (userresponse.status === 401) {
+                        handleLogout();
+                        console.log('Token inválido o expirado. Cerrando sesión.');
 
-            try{
-                const userresponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/user/perfil`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
-                });
-                if (userresponse.status === 401) {
-                    Navbar.handleLogout();
-                    console.warn('Token inválido o expirado. Cerrando sesión.');
-                    
+                } catch (error) {
+                    console.error('Error al obtener perfil del usuario:', error);
                 }
-            } catch (error) {
-                console.error('Error al obtener perfil del usuario:', error);
             }
-
             const options = { method: 'GET', headers: { 'x-cg-demo-api-key': 'CG-zEzVoDknRQgmq3QKL5wFqXh3' } };
 
             try {

@@ -8,8 +8,8 @@ export const Navbar = () => {
 
     const { store, dispatch } = useGlobalReducer();
     const navigate = useNavigate();
-
     const handleLogout = () => {
+
         localStorage.removeItem("jwt-token");
 
         dispatch({ type: "LOGOUT" });
@@ -55,7 +55,7 @@ export const Navbar = () => {
                                         </ul>
                                     </li>
                                 </ul>
-                                
+
                                 <form className="d-flex me-3" role="search">
                                     <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
                                     <button className="btn btn-outline-success" type="submit">Buscar</button>
@@ -67,22 +67,29 @@ export const Navbar = () => {
                         </>
 
                     ) : (
+                        <div className="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                                <li className="nav-item">
+                                    <Link className="nav-link" to="/market">Lista de activos</Link>
+                                </li>
+                            </ul>
+                            <div className="ms-auto d-flex gap-2">
 
-                        <div className="ms-auto d-flex gap-2">
-                            <button className="btn btn-outline-primary"
-                                data-bs-toggle="modal"
-                                data-bs-target="#loginModal"
-                                onClick={() => dispatch({ type: "SET_MESSAGE", payload: null })}
-                            >
-                                Login
-                            </button>
-                            <button className="btn btn-primary"
-                                data-bs-toggle="modal"
-                                data-bs-target="#registerModal"
-                                onClick={() => dispatch({ type: "SET_MESSAGE", payload: null })}
-                            >
-                                Registrarse
-                            </button>
+                                <button className="btn btn-outline-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#loginModal"
+                                    onClick={() => dispatch({ type: "SET_MESSAGE", payload: null })}
+                                >
+                                    Login
+                                </button>
+                                <button className="btn btn-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#registerModal"
+                                    onClick={() => dispatch({ type: "SET_MESSAGE", payload: null })}
+                                >
+                                    Registrarse
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>
