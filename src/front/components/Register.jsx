@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import { toast } from 'react-toastify';
 
 export const Register = ({ id }) => {
 
@@ -19,13 +20,15 @@ export const Register = ({ id }) => {
                 type: "SET_MESSAGE",
                 payload: { msg: "⚠️ Rellena todos los campos.", status: 400 }
             });
+            toast.info('Rellena todos los campos.');
             return;
-        }     
+        }
         if (password.length < 8) {
             dispatch({
                 type: "SET_MESSAGE",
                 payload: { msg: "⚠️ La contraseña debe tener al menos 8 caracteres", status: 400 }
             });
+            toast.info('La contraseña debe tener al menos 8 caracteres');
             return;
         }
         if (!tieneLetra || !tieneNumero) {
@@ -33,6 +36,7 @@ export const Register = ({ id }) => {
                 type: "SET_MESSAGE",
                 payload: { msg: "⚠️ La contraseña debe contener al menos una letra y un número.", status: 400 }
             });
+            toast.info('La contraseña debe contener al menos una letra y un número.');
             return;
         }
         try {
@@ -47,6 +51,7 @@ export const Register = ({ id }) => {
                     type: "SET_MESSAGE",
                     payload: { msg: "📧 El usuario ya existe.", status: 409 }
                 });
+                toast.error('El usuario ya existe');
                 return;
             }
 
@@ -55,6 +60,7 @@ export const Register = ({ id }) => {
                     type: "SET_MESSAGE",
                     payload: { msg: "✅ ¡Usuario creado con éxito!", status: 201 }
                 });
+                toast.success('¡Usuario creado con éxito!');
                 setName(""); setLast_name(""); setEmail(""); setPassword("");
 
                 setTimeout(() => {
@@ -69,6 +75,7 @@ export const Register = ({ id }) => {
                 type: "SET_MESSAGE",
                 payload: { msg: "🚀 Error de conexión.", status: 500 }
             });
+            toast.error('Error de conexión');
         }
     };
 
@@ -94,11 +101,6 @@ export const Register = ({ id }) => {
                         ></button>
                     </div>
                     <div className="modal-body text-start">
-                        {store.message ? (
-                            <div className={`alert ${store.message.status >= 200 && store.message.status < 300 ? 'alert-success' : 'alert-danger'} p-2`}>
-                                {store.message.msg || store.message}
-                            </div>
-                        ) : null}
                         <input
                             className="form-control mb-2"
                             type="text"

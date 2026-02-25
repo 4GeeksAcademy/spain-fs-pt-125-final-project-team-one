@@ -17,6 +17,7 @@ bcrypt = Bcrypt()
 # Allow CORS requests to this API
 CORS(api)
 
+
 @api.route("/register", methods=["POST"])
 def handle_register():
     body = request.get_json(silent=True)
@@ -66,120 +67,121 @@ def create_token():
 
     access_token = create_access_token(
         identity=str(user.id),
-        expires_delta=timedelta(seconds=10))
+        expires_delta=timedelta(seconds=3600))
 
     return jsonify({"token": access_token, "user_id": user.id, "msg": "Login exitoso"}), 200
+
 
 @api.route("/user/profile", methods=["GET"])
 @jwt_required()
 def get_user_profile():
     try:
         current_user_id = get_jwt_identity()
-        
+
         user = db.session.execute(
             select(User).where(User.id == int(current_user_id))
         ).scalar_one_or_none()
-        
+
         if not user:
             return jsonify({"msg": "Usuario no encontrado"}), 404
-        
+
         return jsonify(user.serialize()), 200
-        
+
     except Exception as e:
         return jsonify({"msg": "Error al obtener perfil", "error": str(e)}), 500
-    
+
 
 @api.route("/user/profile", methods=["PUT"])
 @jwt_required()
 def update_user_profile():
     try:
-        
+
         current_user_id = get_jwt_identity()
-        
+
         body = request.get_json(silent=True)
         if not body:
             return jsonify({"msg": "Cuerpo faltante"}), 400
-        
+
         name = body.get("name")
         last_name = body.get("last_name")
         email = body.get("email")
-        
+        image_url = body.get("image")
+
         if not name or not last_name or not email:
             return jsonify({"msg": "Todos los campos son obligatorios"}), 400
-        
+
         user = db.session.execute(
             select(User).where(User.id == int(current_user_id))
         ).scalar_one_or_none()
-        
+
         if not user:
             return jsonify({"msg": "Usuario no encontrado"}), 404
-        
 
         if email != user.email:
             existing_user = db.session.execute(
                 select(User).where(User.email == email)
             ).scalar_one_or_none()
-            
+
             if existing_user:
                 return jsonify({"msg": "El email ya está en uso"}), 409
-        
 
         user.name = name
         user.last_name = last_name
         user.email = email
-        
+        user.image_url = image_url
+
         db.session.commit()
-        
 
         return jsonify(user.serialize()), 200
-        
+
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al actualizar perfil", "error": str(e)}), 500
-       
+
 
 @api.route("/user/change-password", methods=["PUT"])
 @jwt_required()
 def change_password():
     try:
         current_user_id = get_jwt_identity()
-        
+
         body = request.get_json(silent=True)
         if not body:
             return jsonify({"msg": "Cuerpo faltante"}), 400
-        
+
         current_password = body.get("current_password")
         new_password = body.get("new_password")
-        
+
         if not current_password or not new_password:
             return jsonify({"msg": "Contraseña actual y nueva son obligatorias"}), 400
-        
-        if len(new_password) < 6:
-            return jsonify({"msg": "La nueva contraseña debe tener al menos 6 caracteres"}), 400
-        
+
+        if len(new_password) < 8:
+            return jsonify({"msg": "La nueva contraseña debe tener al menos 8 caracteres"}), 400
+
         user = db.session.execute(
             select(User).where(User.id == int(current_user_id))
         ).scalar_one_or_none()
-        
+
         if not user:
             return jsonify({"msg": "Usuario no encontrado"}), 404
-        
+
         if not bcrypt.check_password_hash(user.password, current_password):
             return jsonify({"msg": "Contraseña actual incorrecta"}), 401
-        
+
         if bcrypt.check_password_hash(user.password, new_password):
             return jsonify({"msg": "La nueva contraseña debe ser diferente a la actual"}), 400
-        
-        hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
-        
+
+        hashed_password = bcrypt.generate_password_hash(
+            new_password).decode('utf-8')
+
         user.password = hashed_password
         db.session.commit()
-        
+
         return jsonify({"msg": "Contraseña cambiada con éxito"}), 200
-        
+
     except Exception as e:
         db.session.rollback()
-        return jsonify({"msg": "Error al cambiar contraseña", "error": str(e)}), 500    
+        return jsonify({"msg": "Error al cambiar contraseña", "error": str(e)}), 500
 
 
 @api.route("/user/favorites", methods=["POST"])
@@ -239,8 +241,44 @@ def add_to_portfolio():
     if not user:
         return jsonify({"msg": "Usuario no encontrado"}), 404
 
-    # Crear nuevo portfolio entry
-    new_portfolio = Portfolio(user_id=user_id, product=product_id)
+    # Buscar si el usuario ya tiene este producto en su portfolio
+    existing_portfolio = db.session.execute(
+        select(Portfolio).where(
+            (Portfolio.user_id == int(user_id)) & (
+                Portfolio.product == product_id)
+        )
+    ).scalar_one_or_none()
+
+    if existing_portfolio:
+        # Si ya existe el portfolio, crear una nueva operación
+        new_operation = Operations(
+            portfolio_id=existing_portfolio.id,
+            product=product_id,
+            amount=amount,
+            total_price_spent=total_price_spent,
+            bought=False
+        )
+        existing_portfolio.amount = existing_portfolio.amount + \
+            amount  # Actualizar cantidad total en el portfolio
+        db.session.add(new_operation)
+        db.session.commit()
+
+        return jsonify({
+            "msg": "Nueva operación creada para producto existente",
+            "portfolio_id": existing_portfolio.id,
+            "product": existing_portfolio.product,
+            "amount": existing_portfolio.amount,
+            "operations": {
+                "id": new_operation.id,
+                "amount": new_operation.amount,
+                "bought": new_operation.bought,
+                "total_price_spent": new_operation.total_price_spent
+            }
+        }), 201
+
+    # Si no existe, crear nuevo portfolio y operación
+    new_portfolio = Portfolio(
+        user_id=user_id, product=product_id, amount=amount)
     db.session.add(new_portfolio)
     db.session.flush()  # Para obtener el ID del portfolio
 
@@ -259,6 +297,7 @@ def add_to_portfolio():
         "msg": "Producto agregado al portfolio",
         "portfolio_id": new_portfolio.id,
         "product": new_portfolio.product,
+        "amount": new_portfolio.amount,
         "operations": {
             "id": new_operation.id,
             "amount": new_operation.amount,
@@ -266,3 +305,34 @@ def add_to_portfolio():
             "total_price_spent": new_operation.total_price_spent
         }
     }), 201
+
+
+@api.route("/operaciones", methods=["GET"])
+@jwt_required()
+def get_operations():
+    try:
+        current_user_id = get_jwt_identity()
+
+        operations = db.session.execute(
+            select(Operations).join(Portfolio).where(
+                Portfolio.user_id == int(current_user_id))
+        ).scalars().all()
+
+        # Serializar las operaciones
+        operations_data = [
+            {
+                "id": op.id,
+                "producto": op.product,
+                "cantidad": op.amount,
+                "precio": op.total_price_spent / op.amount if op.amount > 0 else 0,
+                "total": op.total_price_spent,
+                "fecha": op.date.isoformat(),
+                "tipo": "venta" if op.bought else "compra",
+            }
+            for op in operations
+        ]
+
+        return jsonify(operations_data), 200
+
+    except Exception as e:
+        return jsonify({"msg": "Error al obtener operaciones", "error": str(e)}), 500

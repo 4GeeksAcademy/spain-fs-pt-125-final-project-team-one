@@ -21,7 +21,7 @@ export function StoreProvider({ children }) {
             dispatch({ type: "SET_MESSAGE", payload: null });
         }, 1000);
 
-
+        
     };
 
 
