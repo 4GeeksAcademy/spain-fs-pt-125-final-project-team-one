@@ -296,6 +296,7 @@ def add_to_portfolio():
     return jsonify({
         "msg": "Producto agregado al portfolio",
         "portfolio_id": new_portfolio.id,
+        "amount": amount,
         "product": new_portfolio.product,
         "amount": new_portfolio.amount,
         "operations": {
