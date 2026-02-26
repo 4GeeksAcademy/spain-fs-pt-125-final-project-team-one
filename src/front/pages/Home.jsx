@@ -12,33 +12,61 @@ export const Home = () => {
 			<div className="bg-dark pt-5 text-center border-bottom border-secondary border-opacity-10">
 				<div className="container">
 					<h1 className="display-2 fw-bold mb-2 text-info text-gradient">
-						IKHAMI<span className=" fs-6 fw-light text-white-50 my-2 tracking-wide text-capitalize">Crypto Dashboard  </span>
+						<i className="bi bi-cpu text-warning" ></i>
+						<span className="display-2 fw-bold mb-2 text-info text-gradient">  IKHAMI</span>
+
+						<span className=" fs-6 fw-light text-white-50 my-2 tracking-wide text-capitalize">Crypto Dashboard  </span>
 					</h1>
-					<h2 className="fs-5 fw-light text-white-75 text-uppercase ls-lg">
+					<h2 className="fs-5 fw-light text-white-75 py-2 text-uppercase ls-lg">
 						Inteligencia de Mercado en tus Manos
 					</h2>
 				</div>
 			</div>
 
 
-			<div className="container-fluid py-5">
+			<div className="container-fluid py-2 ">
 
-				<div className="row mb-5">
-					<div className="col-lg-12 text-center">
-						<h2 className="mb-3">Sobre Nosotros</h2>
-						<p className="lead text-muted mx-auto" style={{ textAlign: 'justify' }} >
-							En el volátil mundo de las criptomonedas, la claridad es tu activo más valioso. IKHAMI es un Crypto Dashboard de última generación diseñado para ofrecerte una visión panorámica y precisa de tu portfolio. Nuestras potencialidades te permitirán gestionar tus movimientos y analizar tendencias con herramientas de nivel institucional, simplificadas para el inversor moderno.
-							<br />Nacimos con una misión clara: eliminar el ruido del mercado. En IKHAMI, combinamos potencia analítica con una interfaz intuitiva para que gestionar tus inversiones sea, por fin, una tarea simple y estratégica.
+				<div className="row mb-4 py-3 border-bottom border-secondary border-opacity-10 align-items-center">
+					<div className="col-lg-12 d-flex justify-content-between align-items-end mb-3">
+						<h2 className="text-success mb-0 fw-bold ">
+							Sobre Nosotros
+						</h2>
+						<div className="d-flex gap-4 pb-1">
+							<i className="bi bi-shield-check text-success opacity-75" style={{ fontSize: '2rem', filter: 'drop-shadow(0 0 5px #0dcaf0)' }}></i>
+							<i className="bi bi-cpu text-warning opacity-75" style={{ fontSize: '2rem', filter: 'drop-shadow(0 0 5px #0dcaf0)' }}></i>
+							<i className="bi bi-globe-americas text-info opacity-75" style={{ fontSize: '2rem', filter: 'drop-shadow(0 0 5px #0dcaf0)' }}></i>
+						</div>
+					</div>
+					<div className="col-lg-12">
+						<p className="lead text-muted" style={{ textAlign: 'justify' }}>
+							En el volátil mundo de las criptomonedas, la claridad es tu activo más valioso. <span className="text-info fw-bold">IKHAMI</span> es un Crypto Dashboard de última generación diseñado para ofrecerte una visión panorámica y precisa de tu portfolio. Nuestras potencialidades te permitirán gestionar tus movimientos y analizar tendencias con herramientas de nivel institucional, simplificadas para el inversor moderno.
+							<br /><br />
+							Nacimos con una misión clara: eliminar el ruido del mercado. En <span className="text-info fw-bold">IKHAMI</span>, combinamos potencia analítica con una interfaz intuitiva para que gestionar tus inversiones sea, por fin, una tarea simple y estratégica.
 						</p>
 					</div>
 				</div>
 
-				<div className="row mb-4">
-					<div className="col-lg-12 text-center mb-2">
-						<h2>¿Qué puedes hacer con IKHAMI?</h2>
-						<p className="text-muted">Descubre todas las funcionalidades que tenemos para ti. Domina tus activos y optimiza tus decisiones.</p>
+
+				<div className="row mb-5 p2-3 border-bottom border-secondary border-opacity-10">
+					<div className="col-lg-12 d-flex justify-content-between align-items-end mb-3">
+						<div className="text-start">
+							<h2 className="text-success mb-0 fw-bold">
+								¿Qué puedes hacer con <span className="text-info text-gradient">IKHAMI</span>?
+							</h2>
+						</div>
+						<div className="d-flex gap-4">
+							<i className="bi bi-graph-up-arrow text-success fo opacity-75" title="Análisis" style={{ fontSize: '2rem', filter: 'drop-shadow(0 0 5px #0dcaf0)' }}></i>
+							<i className="bi bi-safe2 text-danger opacity-75" title="Seguridad" style={{ fontSize: '2rem', filter: 'drop-shadow(0 0 5px #0dcaf0)' }}></i>
+							<i className="bi bi-lightning-charge text-warning opacity-75" title="Rapidez" style={{ fontSize: '2rem', filter: 'drop-shadow(0 0 5px #0dcaf0)' }}></i>
+						</div>
+					</div>
+					<div className="col-lg-12 ">
+						<p className="lead text-muted" style={{ textAlign: 'justify' }}>
+							Descubre todas las funcionalidades que tenemos para ti. Domina tus activos y optimiza tus decisiones con nuestra tecnología punta.
+						</p>
 					</div>
 				</div>
+
 
 				<div className="row g-4">
 					<div className="col-md-6 col-lg-3">
