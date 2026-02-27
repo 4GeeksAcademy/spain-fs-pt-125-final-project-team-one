@@ -31,7 +31,7 @@ export function StoreProvider({ children }) {
     // 3. Limpiar el mensaje tras unos segundos
     setTimeout(() => {
         dispatch({ type: "SET_MESSAGE", payload: null });
-    }, 4000);
+    }, 1000);
 };
 
 

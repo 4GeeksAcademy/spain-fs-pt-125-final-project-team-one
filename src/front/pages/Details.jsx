@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState, useRef, memo } from 'react';
 import useGlobalReducer from '../hooks/useGlobalReducer';
+import { toast } from 'react-toastify';
 
 export const Details = () => {
     const { index } = useParams();
@@ -32,8 +33,8 @@ export const Details = () => {
     const handleAddPortfolioClick = async () => {
         const token = store.token || localStorage.getItem('jwt-token');
 
-        if (!token ) {
-            alert('Por favor inicia sesión para agregar al portfolio');
+        if (!token) {
+            toast.info('Por favor inicia sesión para agregar al portfolio');
             return;
         }
 
@@ -50,15 +51,16 @@ export const Details = () => {
                 body: JSON.stringify({ product_id: product.id, amount: quantity, total_price_spent: total_price_spent }),
             });
 
+            const data = await response.json();
+
             if (!response.ok) {
-                throw new Error('Error al agregar al portfolio');
+                throw new Error(data.msg || 'Error al agregar al portfolio');
             }
 
-            const data = await response.json();
-            alert('Moneda agregada al portfolio correctamente');
+            toast.success('Moneda agregada al portfolio correctamente');
         } catch (err) {
             console.error('Error:', err);
-            alert('Error al agregar al portfolio: ' + err.message);
+            toast.error('Error al agregar al portfolio: ' + (err.message || err));
         } finally {
             setAddingPortfolio(false);
         }
@@ -66,13 +68,14 @@ export const Details = () => {
 
     const handleFavoriteClick = async () => {
         const token = store.token || localStorage.getItem('jwt-token');
-        
 
         if (!token) {
-            alert('Por favor inicia sesión para agregar favoritos');
+            toast.info('Por favor inicia sesión para agregar favoritos');
             return;
         }
 
+        // Optimistic update
+        const previous = isFavorite;
         setIsFavorite(!isFavorite);
         setSavingFavorite(true);
 
@@ -84,20 +87,21 @@ export const Details = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({ product_id: product.id}),
+                body: JSON.stringify({ product_id: product.id }),
             });
 
+            const data = await response.json();
+
             if (!response.ok) {
-                const data = await response.json();
                 throw new Error(data.msg || 'Error al guardar favorito');
             }
 
-            const data = await response.json();
             setIsFavorite(data.is_favorite);
+            toast.success(data.is_favorite ? 'Agregado a favoritos' : 'Removido de favoritos');
         } catch (err) {
             console.error('Error:', err);
-            setIsFavorite(!isFavorite);
-            alert('Error al guardar favorito: ' + err.message);
+            setIsFavorite(previous);
+            toast.error('Error al guardar favorito: ' + (err.message || err));
         } finally {
             setSavingFavorite(false);
         }
@@ -273,10 +277,10 @@ export const Details = () => {
                                         <div className="mb-3">
                                             <div className="d-flex justify-content-between align-items-center mb-1">
                                                 <div className='d-flex align-items-center gap-2'>
-                                                <label htmlFor="quantitySlider" className="form-label">
-                                                    Cantidad a agregar:
-                                                </label>
-                                                
+                                                    <label htmlFor="quantitySlider" className="form-label">
+                                                        Cantidad a agregar:
+                                                    </label>
+
                                                     <input
                                                         type="number"
                                                         className="form-control form-control-sm"
@@ -287,8 +291,8 @@ export const Details = () => {
                                                         value={quantity}
                                                         onChange={(e) => setQuantity(parseFloat(e.target.value) || 0)}
                                                     /></div>
-                                                    <strong>{(quantity * (product.current_price ?? 0)).toFixed(2)} $</strong>
-                                                
+                                                <strong>{(quantity * (product.current_price ?? 0)).toFixed(2)} $</strong>
+
                                             </div>
                                             <input
                                                 type="range"
