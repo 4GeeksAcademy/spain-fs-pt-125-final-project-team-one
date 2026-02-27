@@ -13,16 +13,27 @@ export function StoreProvider({ children }) {
     const [store, dispatch] = useReducer(storeReducer, initialStore())
 
     const handleLogout = () => {
-        localStorage.removeItem("jwt-token");
+    // 1. Limpieza de datos
+    localStorage.removeItem("jwt-token");
+    dispatch({ type: "LOGOUT" });
 
-        dispatch({ type: "LOGOUT" });
-
-        setTimeout(() => {
-            dispatch({ type: "SET_MESSAGE", payload: null });
-        }, 1000);
-
+    // 2. Abrir el modal de Login (solo si el token expiró o se cerró sesión)
+    // Usamos un pequeño delay para que React procese el cambio de estado primero
+    setTimeout(() => {
+        const loginButton = document.querySelector('[data-bs-target="#loginModal"]');
+        if (loginButton) {
+            loginButton.click();
+        }
         
-    };
+        dispatch({ type: "SET_MESSAGE", payload: { msg: "Sesión expirada. Por favor, identifícate de nuevo.", status: 401 } });
+    }, 500);
+
+    // 3. Limpiar el mensaje tras unos segundos
+    setTimeout(() => {
+        dispatch({ type: "SET_MESSAGE", payload: null });
+    }, 1000);
+};
+
 
 
     useEffect(() => {
