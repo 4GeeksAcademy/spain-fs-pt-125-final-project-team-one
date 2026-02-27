@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import { toast } from 'react-toastify';
 
 export const Login = ({ id }) => {
-    
+
     const { store, dispatch } = useGlobalReducer();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -34,10 +35,12 @@ export const Login = ({ id }) => {
             });
             if (resp.status === 401) {
                 dispatch({ type: "SET_MESSAGE", payload: { msg: "Email o contraseña incorrectos", status: 401 } });
+                toast.error('Email o contraseña incorrectos');
                 return;
             }
             if (!resp.ok) {
                 dispatch({ type: "SET_MESSAGE", payload: { msg: "Error de servidor", status: resp.status } });
+                toast.error('Error de servidor');
                 return;
             }
 
@@ -45,6 +48,7 @@ export const Login = ({ id }) => {
             localStorage.setItem("jwt-token", data.token);
             dispatch({ type: "LOGIN", payload: data.token });
             dispatch({ type: "SET_MESSAGE", payload: { msg: "¡Sesión iniciada!", status: 200 } });
+            toast.success('¡Sesión iniciada!');
 
             setTimeout(() => {
                 const closeBtn = document.getElementById("finalizar-login");
@@ -56,6 +60,7 @@ export const Login = ({ id }) => {
 
         } catch (error) {
             dispatch({ type: "SET_MESSAGE", payload: { msg: "Error de conexión", status: 500 } });
+            toast.error('Error de conexión');
         }
     };
 
@@ -79,11 +84,6 @@ export const Login = ({ id }) => {
                         ></button>
                     </div>
                     <div className="modal-body">
-                        {store.message ? (
-                            <div className={`alert ${store.message.status >= 200 && store.message.status < 300 ? 'alert-success' : 'alert-danger'} p-2`}>
-                                {store.message.msg || store.message}
-                            </div>
-                        ) : null}
                         <input
                             className="form-control mb-2"
                             type="email"

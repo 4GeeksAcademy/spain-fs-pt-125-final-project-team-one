@@ -1,5 +1,7 @@
-import React, { useState, Link } from "react"
+import React, { useState } from "react"
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 export const ChangePassword = () => {
 	const { store, dispatch } = useGlobalReducer()
@@ -8,6 +10,7 @@ export const ChangePassword = () => {
 		newPassword: "",
 		confirmPassword: ""
 	})
+	const Navigate = useNavigate()
 	const [error, setError] = useState("")
 	const [success, setSuccess] = useState("")
 	const [loading, setLoading] = useState(false)
@@ -51,7 +54,7 @@ export const ChangePassword = () => {
 
 		try {
 			const backendUrl = import.meta.env.VITE_BACKEND_URL
-			const token = localStorage.getItem("jwt-token") 
+			const token = localStorage.getItem("jwt-token")
 
 			const response = await fetch(`${backendUrl}/api/user/change-password`, {
 				method: 'PUT',
@@ -69,6 +72,7 @@ export const ChangePassword = () => {
 
 			if (response.ok) {
 				setSuccess(data.msg || "Contraseña cambiada con éxito")
+				toast.success(data.msg || "Contraseña cambiada con éxito")
 				setFormData({
 					currentPassword: "",
 					newPassword: "",
@@ -76,13 +80,16 @@ export const ChangePassword = () => {
 				})
 			} else {
 				setError(data.msg || "Error al cambiar la contraseña")
+				toast.error(data.msg || "Error al cambiar la contraseña")
 			}
 		} catch (error) {
 			console.error('Error:', error)
 			setError("Error de conexión con el servidor")
+			toast.error("Error de conexión con el servidor")
 		} finally {
 			setLoading(false)
 		}
+		Navigate("/user/perfil")
 	}
 
 	return (

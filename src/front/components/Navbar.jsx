@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import { Login } from "./Login";
 import { Register } from "./Register";
+import { toast } from 'react-toastify';
 
 export const Navbar = () => {
 
@@ -13,6 +14,8 @@ export const Navbar = () => {
         localStorage.removeItem("jwt-token");
 
         dispatch({ type: "LOGOUT" });
+
+        toast.info('Sesión cerrada');
 
         setTimeout(() => {
             dispatch({ type: "SET_MESSAGE", payload: null });
@@ -44,22 +47,11 @@ export const Navbar = () => {
                                     <li className="nav-item">
                                         <Link className="nav-link" to="/operaciones">Operaciones</Link>
                                     </li>
-                                    <li className="nav-item dropdown">
-                                        <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Perfil
-                                        </a>
-                                        <ul className="dropdown-menu">
-                                            <li><Link className="dropdown-item" to="/perfil">Mi Perfil</Link></li>
-                                            <li><hr className="dropdown-divider" /></li>
-                                            <li><button className="dropdown-item text-danger" onClick={handleLogout}>Logout</button></li>
-                                        </ul>
+                                    <li className="nav-item">
+                                        <Link className="nav-link" to="/user/perfil">Perfil</Link>
                                     </li>
                                 </ul>
 
-                                <form className="d-flex me-3" role="search">
-                                    <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-                                    <button className="btn btn-outline-success" type="submit">Buscar</button>
-                                </form>
                                 <button className="btn btn-danger" onClick={handleLogout}>
                                     Logout
                                 </button>
@@ -94,14 +86,6 @@ export const Navbar = () => {
                     )}
                 </div>
             </nav>
-
-            <div className="container mt-2">
-                {store.message && store.message.status >= 200 && store.message.status < 300 ? (
-                    <div className={`alert ${store.message.status >= 200 && store.message.status < 300 ? 'alert-success' : 'alert-danger'} p-2 text-center`}>
-                        {store.message.msg || store.message}
-                    </div>
-                ) : null}
-            </div>
             <Login id="loginModal" />
             <Register id="registerModal" />
         </>
