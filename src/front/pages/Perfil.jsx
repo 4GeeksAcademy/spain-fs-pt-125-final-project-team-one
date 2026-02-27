@@ -164,7 +164,7 @@ export const Perfil = () => {
 		<div className="container-fluid py-5 px-lg-5">
 			<div className="row">
 				<div className="col-12">
-					<h1 className="mb-5 fw-bold">Mi Perfil</h1>
+					<h1 className="mb-5 fw-bold text-light">Mi Perfil</h1>
 				</div>
 			</div>
 
@@ -193,31 +193,29 @@ export const Perfil = () => {
 				<div className="col-lg-8">
 					<div className="card bg-dark border-0">
 						<div className="card-body p-5">
-							<h5 className="card-title mb-5 fw-bold fs-4">Información Personal</h5>
+							<h5 className="card-title mb-5 fw-bold fs-4 text-light">Información Personal</h5>
 
 							<div className="row mb-4">
 								<div className="col-md-6">
 									<label className="text-muted small d-block mb-2">Nombre</label>
-									<p className="h6 text-white mb-0">Nombre: {user.name}</p>
+									<p className="h6 text-white mb-0"><i className="bi bi-person me-2"></i>Nombre: {user.name}</p>
 								</div>
 								<div className="col-md-6">
 									<label className="text-muted small d-block mb-2">Apellido</label>
-									<p className="h6 text-white mb-0">Apellidos: {user.last_name}</p>
+									<p className="h6 text-white mb-0"><i className="bi bi-person-badge me-2"></i> Apellidos: {user.last_name}</p>
 								</div>
 							</div>
 
 							<div className="mb-5">
 								<label className="text-muted small d-block mb-2">Correo Electrónico</label>
-								<p className="h6 text-white mb-0 text-break">Email: {user.email}</p>
+								<p className="h6 text-white mb-0 text-break"><i className="bi bi-envelope me-2"></i> Email: {user.email}</p>
 							</div>
 
 							<hr className="my-5" />
 
-							<h5 className="card-title mb-4 fw-bold fs-4">Acciones</h5>
-
 							<div className="d-flex gap-2">
 								<button
-									className="btn btn-primary"
+									className="btn btn-success"
 									data-bs-toggle="modal"
 									data-bs-target="#editProfileModal"
 									onClick={openEditModal}
