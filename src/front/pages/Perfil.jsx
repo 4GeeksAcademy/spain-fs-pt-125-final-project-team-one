@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react"
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import { Link } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 export const Perfil = () => {
 	const { store, dispatch } = useGlobalReducer()
 	const [user, setUser] = useState(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState(null)
-	
+
 	const [editForm, setEditForm] = useState({
 		name: "",
 		last_name: "",
@@ -42,7 +44,8 @@ export const Perfil = () => {
 				setEditForm({
 					name: data.name,
 					last_name: data.last_name,
-					email: data.email
+					email: data.email,
+					image: data.image
 				})
 			} else {
 				setError(data.msg || "Error al cargar perfil")
@@ -104,7 +107,8 @@ export const Perfil = () => {
 				body: JSON.stringify({
 					name: editForm.name,
 					last_name: editForm.last_name,
-					email: editForm.email
+					email: editForm.email,
+					image: editForm.image
 				})
 			})
 
@@ -112,6 +116,7 @@ export const Perfil = () => {
 
 			if (response.ok) {
 				setEditSuccess("Perfil actualizado con éxito")
+				toast.success("Perfil actualizado con éxito")
 				setUser(data)
 				setTimeout(() => {
 					const modalElement = document.getElementById('editProfileModal')
@@ -121,10 +126,12 @@ export const Perfil = () => {
 				}, 1500)
 			} else {
 				setEditError(data.msg || "Error al actualizar perfil")
+				toast.error(data.msg || "Error al actualizar perfil")
 			}
 		} catch (error) {
 			console.error('Error:', error)
 			setEditError("Error de conexión con el servidor")
+			toast.error("Error de conexión con el servidor")
 		} finally {
 			setEditLoading(false)
 		}
@@ -161,15 +168,14 @@ export const Perfil = () => {
 						<div className="card-body">
 							<div className="row">
 								<div className="col-md-4 text-center mb-4 mb-md-0">
-									<img 
-										src="https://via.placeholder.com/150" 
-										alt="Profile" 
+									<img
+										src={user.image || "https://https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541.placeholder.com/150"}
+										alt="Profile"
 										className="rounded-circle img-fluid mb-3"
 										width="150"
 										height="150"
 									/>
-									<h4 className="mb-1">{user.name} {user.last_name}</h4>
-									<p className="text-muted">{user.email}</p>
+									<br />
 									<span className={`badge ${user.is_active ? 'bg-success' : 'bg-danger'}`}>
 										{user.is_active ? 'Activo' : 'Inactivo'}
 									</span>
@@ -177,7 +183,7 @@ export const Perfil = () => {
 
 								<div className="col-md-8">
 									<h5 className="mb-4">Información del Perfil</h5>
-									
+
 									<div className="mb-3">
 										<label className="text-muted small">Nombre Completo</label>
 										<p className="mb-2">{user.name} {user.last_name}</p>
@@ -189,11 +195,11 @@ export const Perfil = () => {
 									</div>
 
 									<hr />
-		
+
 									<div className="mt-4">
-										<button 
+										<button
 											className="btn btn-primary me-2 mb-2"
-											data-bs-toggle="modal" 
+											data-bs-toggle="modal"
 											data-bs-target="#editProfileModal"
 											onClick={openEditModal}
 										>
@@ -206,7 +212,7 @@ export const Perfil = () => {
 								</div>
 							</div>
 						</div>
-					</div>					
+					</div>
 				</div>
 			</div>
 
@@ -271,6 +277,19 @@ export const Perfil = () => {
 										required
 									/>
 								</div>
+
+								<div className="mb-3">
+									<label htmlFor="image" className="form-label">URL de Imagen de Perfil</label>
+									<input
+										type="text"
+										className="form-control"
+										id="image"
+										name="image"
+										value={editForm.image}
+										onChange={handleEditChange}
+									/>
+								</div>
+
 							</div>
 							<div className="modal-footer">
 								<button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
