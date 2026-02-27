@@ -18,9 +18,9 @@ const Main = () => {
     return (
         <React.StrictMode>
             {/* Provide global state to all components */}
-
+            <ToastContainer position="top-right" autoClose={3000} />
             <StoreProvider>
-                <ToastContainer position="top-right" autoClose={3000} />
+
                 {/* Set up routing for the application */}
                 <RouterProvider router={router} />
             </StoreProvider>
