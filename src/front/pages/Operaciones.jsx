@@ -49,10 +49,10 @@ export const Operaciones = () => {
     if (error) return <div className="alert alert-danger m-4">Error: {error}</div>;
 
     return (
-        <div className="container-fluid p-4 mt-5">
-            <h1 className="mb-4 text-center">Mis Operaciones</h1>
+        <div className="container-fluid bg-dark py-5 px-0 ">
+            <h1 className="mb-5 px-3 text-center text-warning">Mis Operaciones</h1>
 
-            <div className="d-flex gap-2 justify-content-center mb-4 flex-wrap">
+            <div className="d-flex gap-4 justify-content-center mb-5 flex-wrap ">
                 <button
                     className={`btn ${filtro === 'todas' ? 'btn-primary' : 'btn-outline-primary'}`}
                     onClick={() => setFiltro('todas')}
@@ -74,23 +74,23 @@ export const Operaciones = () => {
             </div>
 
             {operacionesFiltradas.length === 0 ? (
-                <div className="alert alert-info text-center">No hay operaciones</div>
+                <div className="alert alert-info text-center bg-secondary text-white w-25 mx-auto">No hay operaciones</div>
             ) : (
-                <div className="table-responsive">
-                    <table className="table table-striped table-hover">
-                        <thead className="table-light">
+                <div className="table-responsive w-100 my-3 border-top border-bottom border-secondary">
+                    <table className="table table-striped table-hover w-100 m-0 text-center">
+                        <thead className="table-secondary border-bottom border-secondary" style={{ backgroundColor: '#7a7d81' }}>
                             <tr>
-                                <th>Fecha</th>
-                                <th>Tipo</th>
-                                <th>Producto</th>
-                                <th>Cantidad</th>
-                                <th>Precio</th>
-                                <th>Total</th>
+                                <th className='text-success'>Fecha</th>
+                                <th className='text-success'>Operación</th>
+                                <th className='text-success'>Producto</th>
+                                <th className='text-success'>Cantidad</th>
+                                <th className='text-success'>Precio</th>
+                                <th className='text-success'>Total</th>
                             </tr>
                         </thead>
                         <tbody>
                             {operacionesFiltradas.map(op => (
-                                <tr key={op.id}>
+                                <tr className="table-primary" key={op.id}>
                                     <td>{new Date(op.fecha).toLocaleDateString()}</td>
                                     <td>
                                         <span className={`badge ${op.tipo === 'compra' ? 'bg-info' : 'bg-success'}`}>
