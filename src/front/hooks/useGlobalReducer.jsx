@@ -59,7 +59,7 @@ export function StoreProvider({ children }) {
                     console.error('Error al obtener perfil del usuario:', error);
                 }
             }
-            const options = { method: 'GET', headers: { 'x-cg-demo-api-key': 'CG-zEzVoDknRQgmq3QKL5wFqXh3' } };
+            const options = { method: 'GET', headers: { 'x-cg-demo-api-key': import.meta.env.VITE_API_KEY } };
 
             try {
                 dispatch({ type: 'API_LOADING' });
