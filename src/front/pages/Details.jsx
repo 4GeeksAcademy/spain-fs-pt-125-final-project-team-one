@@ -112,7 +112,7 @@ export const Details = () => {
         if (!product || !product.id) return;
         setLoading(true);
         setError(null);
-        const options = { method: 'GET', headers: { 'x-cg-demo-api-key': 'CG-zEzVoDknRQgmq3QKL5wFqXh3' } };
+        const options = { method: 'GET', headers: { 'x-cg-demo-api-key': import.meta.env.VITE_API_KEY } };
         fetch(`https://api.coingecko.com/api/v3/coins/${product.id}`, options)
             .then((res) => {
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
