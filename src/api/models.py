@@ -21,7 +21,8 @@ class User(db.Model):
         300), nullable=True, default="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541")
     is_active: Mapped[bool] = mapped_column(
         Boolean(), nullable=False, default=True)
-    portfolio: Mapped["Portfolio"] = relationship(back_populates="user")
+    portfolio: Mapped["Portfolio"] = relationship(
+        back_populates="user")
 
     def serialize(self):
         return {
@@ -44,7 +45,8 @@ class Portfolio(db.Model):
     amount: Mapped[float] = mapped_column(nullable=False, default=0)
     date: Mapped[datetime] = mapped_column(
         DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
-    operations: Mapped["Operations"] = relationship(back_populates="portfolio")
+    operations: Mapped["Operations"] = relationship(
+        back_populates="portfolio", cascade="delete-orphan")
 
     def serialize(self):
         return {
@@ -58,14 +60,16 @@ class Portfolio(db.Model):
 
 class Operations(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, unique=True)
-    portfolio_id: Mapped[int] = mapped_column(ForeignKey("portfolio.id"))
+    portfolio_id: Mapped[int | None] = mapped_column(
+        ForeignKey("portfolio.id"), nullable=True)
     portfolio: Mapped["Portfolio"] = relationship(back_populates="operations")
     product: Mapped[str] = mapped_column(nullable=False)
     date: Mapped[datetime] = mapped_column(
         DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     total_price_spent: Mapped[float] = mapped_column(nullable=True)
     amount: Mapped[float] = mapped_column(nullable=False)
-    bought: Mapped[bool] = mapped_column(Boolean(), nullable=False)
+    bought: Mapped[bool] = mapped_column(
+        Boolean(), nullable=False, default=True)
 
     def serialize(self):
         return {
