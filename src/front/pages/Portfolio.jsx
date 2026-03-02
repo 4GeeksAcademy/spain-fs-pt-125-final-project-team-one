@@ -231,7 +231,7 @@ export const Portfolio = () => {
 											</td>
 											<td className="text-center align-middle">
 												<button className="btn btn-sm btn-danger" onClick={() => handleSellCrypto(crypto.id, crypto.totalValue)}>
-													Vender
+													Eliminar
 												</button>
 											</td>
 										</tr>
