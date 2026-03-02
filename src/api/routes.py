@@ -334,7 +334,7 @@ def get_user_portfolio_data():
 
         # Llamar a CoinGecko para obtener precios actuales
         coingecko_url = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={','.join(crypto_ids)}"
-        headers = {'x-cg-demo-api-key': 'CG-zEzVoDknRQgmq3QKL5wFqXh3'}
+        headers = {'x-cg-demo-api-key': os.getenv("VITE_API_KEY")}
 
         try:
             coingecko_response = requests.get(
