@@ -289,7 +289,7 @@ def add_to_portfolio():
         product=product_id,
         amount=amount,
         total_price_spent=total_price_spent,
-        bought=False
+        bought=True
     )
     db.session.add(new_operation)
     db.session.commit()
@@ -370,23 +370,26 @@ def get_user_portfolio_data():
                 continue
 
             # Usar la cantidad almacenada en Portfolio como cantidad total
-            total_amount = portfolio_item.amount or 0
+            total_amount = portfolio_item.amount
 
             # Calcular gasto total considerando solo compras (bought == True)
             total_spent = 0
             for op in operations:
-                if op.bought:
-                    total_spent += (op.total_price_spent or 0)
+                if op.bought == False:
+                    total_spent -= (op.total_price_spent)
+
+                if op.bought == True:
+                    total_spent += (op.total_price_spent)
 
             # Precio medio de compra
             avg_buy_price = (
-                total_spent / total_amount) if total_amount > 0 else 0
+                total_spent / portfolio_item.amount) if total_amount > 0 else 0
 
             # Obtener precio actual de CoinGecko (o usar avg_buy_price si no está disponible)
             current_price = current_prices.get(
                 portfolio_item.product, avg_buy_price)
 
-            crypto_value = total_amount * current_price
+            crypto_value = portfolio_item.amount * current_price
             profit_loss = crypto_value - total_spent
             profit_loss_percentage = (
                 profit_loss / total_spent * 100) if total_spent > 0 else 0
@@ -432,6 +435,64 @@ def get_user_portfolio_data():
         return jsonify({"msg": "Error al obtener portfolio", "error": str(e)}), 500
 
 
+@api.route("/user/portfolio/<int:portfolio_id>", methods=["DELETE"])
+@jwt_required()
+def remove_from_portfolio(portfolio_id):
+    try:
+        user_id = get_jwt_identity()
+
+        # buscar el portfolio correspondiente al usuario
+        portfolio_item = db.session.execute(
+            select(Portfolio).where(
+                (Portfolio.id == portfolio_id) &
+                (Portfolio.user_id == int(user_id))
+            )
+        ).scalar_one_or_none()
+
+        if not portfolio_item:
+            return jsonify({"msg": "Elemento de portfolio no encontrado"}), 404
+
+        amount = portfolio_item.amount
+        if amount <= 0:
+            return jsonify({"msg": "La cantidad es cero o negativa"}), 400
+
+        body = request.get_json(silent=True) or {}
+        total_price = body.get("total_price_spent", 0)
+        try:
+            total_price = float(total_price)
+        except (TypeError, ValueError):
+            total_price = 0
+
+        # crear operación de venta SIN portfolio_id (operación independiente)
+        # para evitar conflictos cuando se elimina el portfolio
+        sell_op = Operations(
+            portfolio_id=None,  # Sin asociación al portfolio
+            product=portfolio_item.product,
+            amount=amount,
+            total_price_spent=total_price,
+            bought=False
+        )
+        db.session.add(sell_op)
+        db.session.flush()  # Asegurar que se crea antes de eliminar
+
+        # eliminar el entry del portfolio DESPUES de crear la operación
+        db.session.delete(portfolio_item)
+        db.session.commit()
+
+        return jsonify({
+            "msg": "Cripto eliminada del portfolio y operación de venta creada",
+            "portfolio_id": portfolio_id,
+            "sold_amount": amount,
+            "total_price": total_price,
+            "operation_id": sell_op.id
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error removing portfolio: {str(e)}")
+        return jsonify({"msg": "Error al vender portfolio", "error": str(e)}), 500
+
+
 @api.route("/operaciones", methods=["GET"])
 @jwt_required()
 def get_operations():
@@ -452,7 +513,8 @@ def get_operations():
                 "precio": op.total_price_spent / op.amount if op.amount > 0 else 0,
                 "total": op.total_price_spent,
                 "fecha": op.date.isoformat(),
-                "tipo": "venta" if op.bought else "compra",
+                "tipo": "compra" if op.bought else "venta",
+                "bought": op.bought,
             }
             for op in operations
         ]
