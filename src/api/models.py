@@ -14,10 +14,13 @@ class User(db.Model):
     password: Mapped[str] = mapped_column(String(300), nullable=False)
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     last_name: Mapped[str] = mapped_column(String(120), nullable=False)
-    favorites_array = Column(MutableList.as_mutable(ARRAY(String)), nullable=False, default=list)
+    favorites_array = Column(MutableList.as_mutable(
+        ARRAY(String)), nullable=False, default=list)
     cash: Mapped[int] = mapped_column(nullable=True)
-    image_url: Mapped[str] = mapped_column(String(300), nullable=True)
-    is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False, default=True)
+    image_url: Mapped[str] = mapped_column(String(
+        300), nullable=True, default="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541")
+    is_active: Mapped[bool] = mapped_column(
+        Boolean(), nullable=False, default=True)
     portfolio: Mapped["Portfolio"] = relationship(back_populates="user")
 
     def serialize(self):
@@ -25,6 +28,7 @@ class User(db.Model):
             "id": self.id,
             "email": self.email,
             "name": self.name,
+            "image": self.image_url,
             "last_name": self.last_name,
             "favorites": self.favorites_array,
             "is_active": self.is_active
@@ -37,7 +41,7 @@ class Portfolio(db.Model):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     user: Mapped["User"] = relationship(back_populates="portfolio")
     product: Mapped[str] = mapped_column(nullable=False)
-    amount: Mapped[float] = mapped_column(nullable=False)
+    amount: Mapped[float] = mapped_column(nullable=False, default=0)
     date: Mapped[datetime] = mapped_column(
         DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     operations: Mapped["Operations"] = relationship(back_populates="portfolio")
@@ -47,6 +51,7 @@ class Portfolio(db.Model):
             "id": self.id,
             "user_id": self.id,
             "product": self.product,
+            "amount": self.amount,
             "date": self.date
         }
 

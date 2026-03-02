@@ -1,6 +1,8 @@
 // Import necessary hooks and functions from React.
 import { useContext, useReducer, createContext, useEffect } from "react";
-import storeReducer, { initialStore } from "../store"  // Import the reducer and the initial state.
+import storeReducer, { initialStore } from "../store" 
+import { toast } from 'react-toastify';
+ // Import the reducer and the initial state.
 // Import the logout function to handle unauthorized access.
 // Create a context to hold the global state of the application
 // We will call this global state the "store" to avoid confusion while using local states
@@ -13,16 +15,27 @@ export function StoreProvider({ children }) {
     const [store, dispatch] = useReducer(storeReducer, initialStore())
 
     const handleLogout = () => {
-        localStorage.removeItem("jwt-token");
+    // 1. Limpieza de datos
+    localStorage.removeItem("jwt-token");
+    dispatch({ type: "LOGOUT" });
 
-        dispatch({ type: "LOGOUT" });
+    // 2. Abrir el modal de Login (solo si el token expiró o se cerró sesión)
+    // Usamos un pequeño delay para que React procese el cambio de estado primero
+    setTimeout(() => {
+        const loginButton = document.querySelector('[data-bs-target="#loginModal"]');
+        if (loginButton) {
+            loginButton.click();
+        }
+        
+        dispatch({ type: "SET_MESSAGE", payload: { msg: "Sesión expirada. Por favor, identifícate de nuevo.", status: 401 } });
+    }, 1000);
 
-        setTimeout(() => {
-            dispatch({ type: "SET_MESSAGE", payload: null });
-        }, 1000);
+    // 3. Limpiar el mensaje tras unos segundos
+    setTimeout(() => {
+        dispatch({ type: "SET_MESSAGE", payload: null });
+    }, 1000);
+};
 
-
-    };
 
 
     useEffect(() => {
@@ -39,14 +52,14 @@ export function StoreProvider({ children }) {
                     });
                     if (userresponse.status === 401) {
                         handleLogout();
-                        console.log('Token inválido o expirado. Cerrando sesión.');
+                        toast.info('Token inválido o expirado. Cerrando sesión.');
 
                     }
                 } catch (error) {
                     console.error('Error al obtener perfil del usuario:', error);
                 }
             }
-            const options = { method: 'GET', headers: { 'x-cg-demo-api-key': 'CG-zEzVoDknRQgmq3QKL5wFqXh3' } };
+            const options = { method: 'GET', headers: { 'x-cg-demo-api-key': import.meta.env.VITE_API_KEY } };
 
             try {
                 dispatch({ type: 'API_LOADING' });

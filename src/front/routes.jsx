@@ -9,9 +9,10 @@ import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
 import { Perfil } from "./pages/Perfil.jsx"
 import { Market } from "./pages/Market";
-import {Details} from "./pages/Details";
+import { Details } from "./pages/Details";
 import { ChangePassword } from "./pages/ChangePassword.jsx"
 import { Portfolio } from "./pages/Portfolio.jsx";
+import { Operaciones } from "./pages/Operaciones.jsx"
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -28,9 +29,10 @@ export const router = createBrowserRouter(
       <Route path="/" element={<Home />} />
       <Route path="/market" element={<Market />} />
       <Route path="/market/:index" element={<Details />} />
-      <Route path="/perfil" element={<Perfil />} />
+      <Route path="/user/perfil" element={<Perfil />} />
       <Route path="/change-password" element={<ChangePassword />} />
       <Route path="/portfolio" element={<Portfolio />} />
+      <Route path="/operaciones" element={<Operaciones />} />
     </Route>
   )
 );
