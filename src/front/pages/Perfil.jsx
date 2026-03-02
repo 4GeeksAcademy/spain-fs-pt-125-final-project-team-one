@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
-import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import { Link } from "react-router-dom";
+import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import { toast } from 'react-toastify';
 
 export const Perfil = () => {
@@ -161,55 +161,71 @@ export const Perfil = () => {
 	}
 
 	return (
-		<div className="container py-5">
-			<div className="row justify-content-center">
+		<div className="container-fluid py-5 px-lg-5">
+			<div className="row">
+				<div className="col-12">
+					<h1 className="mb-5 fw-bold text-light">Mi Perfil</h1>
+				</div>
+			</div>
+
+			<div className="row g-4 align-items-center">
+				{/* Imagen a la izquierda */}
+				<div className="col-lg-4 d-flex justify-content-center">
+					<div className="card bg-dark border-0" style={{ maxWidth: '300px' }}>
+						<div className="card-body text-center py-5">
+							<img
+								src={user.image || "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541.placeholder.com/150"}
+								alt="Profile"
+								className="rounded-circle img-fluid mb-4"
+								width="200"
+								height="200"
+								style={{ objectFit: 'cover' }}
+							/>
+							<h5 className="text-white mb-3">{user.name} {user.last_name}</h5>
+							<span className={`badge fs-6 ${user.is_active ? 'bg-success' : 'bg-danger'}`}>
+								{user.is_active ? '● Activo' : '● Inactivo'}
+							</span>
+						</div>
+					</div>
+				</div>
+
+				{/* Información y Acciones a la derecha */}
 				<div className="col-lg-8">
-					<div className="card shadow-sm">
-						<div className="card-body">
-							<div className="row">
-								<div className="col-md-4 text-center mb-4 mb-md-0">
-									<img
-										src={user.image || "https://https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541.placeholder.com/150"}
-										alt="Profile"
-										className="rounded-circle img-fluid mb-3"
-										width="150"
-										height="150"
-									/>
-									<br />
-									<span className={`badge ${user.is_active ? 'bg-success' : 'bg-danger'}`}>
-										{user.is_active ? 'Activo' : 'Inactivo'}
-									</span>
+					<div className="card bg-dark border-0">
+						<div className="card-body p-5">
+							<h5 className="card-title mb-5 fw-bold fs-4 text-light">Información Personal</h5>
+
+							<div className="row mb-4">
+								<div className="col-md-6">
+									<label className="text-muted small d-block mb-2">Nombre</label>
+									<p className="h6 text-white mb-0"><i className="bi bi-person me-2"></i>Nombre: {user.name}</p>
 								</div>
-
-								<div className="col-md-8">
-									<h5 className="mb-4">Información del Perfil</h5>
-
-									<div className="mb-3">
-										<label className="text-muted small">Nombre Completo</label>
-										<p className="mb-2">{user.name} {user.last_name}</p>
-									</div>
-
-									<div className="mb-3">
-										<label className="text-muted small">Email</label>
-										<p className="mb-2">{user.email}</p>
-									</div>
-
-									<hr />
-
-									<div className="mt-4">
-										<button
-											className="btn btn-primary me-2 mb-2"
-											data-bs-toggle="modal"
-											data-bs-target="#editProfileModal"
-											onClick={openEditModal}
-										>
-											<i className="bi bi-pencil"></i> Editar Perfil
-										</button>
-										<Link to="/change-password" className="btn btn-warning me-2 mb-2">
-											<i className="bi bi-key"></i> Cambiar Contraseña
-										</Link>
-									</div>
+								<div className="col-md-6">
+									<label className="text-muted small d-block mb-2">Apellido</label>
+									<p className="h6 text-white mb-0"><i className="bi bi-person-badge me-2"></i> Apellidos: {user.last_name}</p>
 								</div>
+							</div>
+
+							<div className="mb-5">
+								<label className="text-muted small d-block mb-2">Correo Electrónico</label>
+								<p className="h6 text-white mb-0 text-break"><i className="bi bi-envelope me-2"></i> Email: {user.email}</p>
+							</div>
+
+							<hr className="my-5" />
+
+							<div className="d-flex gap-2">
+								<button
+									className="btn btn-success"
+									data-bs-toggle="modal"
+									data-bs-target="#editProfileModal"
+									onClick={openEditModal}
+								>
+									<i className="bi bi-pencil me-2"></i> Editar Perfil
+								</button>
+
+								<Link to="/change-password" className="btn btn-warning">
+									<i className="bi bi-key me-2"></i> Cambiar Contraseña
+								</Link>
 							</div>
 						</div>
 					</div>

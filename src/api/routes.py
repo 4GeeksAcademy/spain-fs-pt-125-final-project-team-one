@@ -2,6 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
+import requests
 from api.models import db, User, Portfolio, Operations
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
@@ -307,6 +308,126 @@ def add_to_portfolio():
         }
     }), 201
 
+
+@api.route("/user/portfolio-data", methods=["GET"])
+@jwt_required()
+def get_user_portfolio_data():
+    try:
+        current_user_id = get_jwt_identity()
+        
+        # Obtener todos los portfolios del usuario
+        portfolios = db.session.execute(
+            select(Portfolio).where(Portfolio.user_id == int(current_user_id))
+        ).scalars().all()
+        
+        if not portfolios:
+            return jsonify({
+                "totalValue": 0,
+                "totalInvested": 0,
+                "profitLoss": 0,
+                "profitLossPercentage": 0,
+                "cryptos": []
+            }), 200
+        
+        # Obtener IDs únicos de criptos del portfolio
+        crypto_ids = list(set([p.product for p in portfolios]))
+        
+        # Llamar a CoinGecko para obtener precios actuales
+        coingecko_url = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={','.join(crypto_ids)}"
+        headers = {'x-cg-demo-api-key': 'CG-zEzVoDknRQgmq3QKL5wFqXh3'}
+        
+        try:
+            coingecko_response = requests.get(coingecko_url, headers=headers, timeout=10)
+            coingecko_data = coingecko_response.json() if coingecko_response.ok else []
+        except:
+            coingecko_data = []
+        
+        # Crear diccionario de precios actuales
+        current_prices = {}
+        crypto_info = {}
+        for coin in coingecko_data:
+            current_prices[coin['id']] = coin['current_price']
+            crypto_info[coin['id']] = {
+                'name': coin['name'],
+                'symbol': coin['symbol'].upper(),
+                'image': coin['image']
+            }
+        
+        # Construir respuesta con todas las criptos
+        cryptos = []
+        total_value = 0
+        total_invested = 0
+        
+        for portfolio_item in portfolios:
+            # Obtener todas las operaciones de este portfolio item
+            operations = db.session.execute(
+                select(Operations).where(Operations.portfolio_id == portfolio_item.id)
+            ).scalars().all()
+            
+            if not operations:
+                continue
+            
+            # Calcular cantidad total y gasto total
+            total_amount = 0
+            total_spent = 0
+            
+            for op in operations:
+                if op.bought:  # Si es compra
+                    total_amount += op.amount
+                    total_spent += op.total_price_spent
+                else:  # Si es venta
+                    total_amount -= op.amount
+            
+            if total_amount <= 0:
+                continue
+            
+            avg_buy_price = total_spent / total_amount if total_amount > 0 else 0
+            
+            # Obtener precio actual de CoinGecko
+            current_price = current_prices.get(portfolio_item.product, avg_buy_price)
+            
+            crypto_value = total_amount * current_price
+            profit_loss = crypto_value - total_spent
+            profit_loss_percentage = (profit_loss / total_spent * 100) if total_spent > 0 else 0
+            
+            total_value += crypto_value
+            total_invested += total_spent
+            
+            # Obtener info de la cripto
+            info = crypto_info.get(portfolio_item.product, {
+                'name': portfolio_item.product.capitalize(),
+                'symbol': portfolio_item.product.upper(),
+                'image': ''
+            })
+            
+            cryptos.append({
+                "id": portfolio_item.id,
+                "product_id": portfolio_item.product,
+                "symbol": info['symbol'],
+                "name": info['name'],
+                "image": info.get('image', ''),
+                "amount": total_amount,
+                "avgBuyPrice": round(avg_buy_price, 2),
+                "currentPrice": round(current_price, 2),
+                "totalValue": round(crypto_value, 2),
+                "profitLoss": round(profit_loss, 2),
+                "profitLossPercentage": round(profit_loss_percentage, 2)
+            })
+        
+        overall_profit_loss = total_value - total_invested
+        overall_profit_loss_percentage = (overall_profit_loss / total_invested * 100) if total_invested > 0 else 0
+        
+        return jsonify({
+            "currentPrices": current_prices,
+            "totalValue": round(total_value, 2),
+            "totalInvested": round(total_invested, 2),
+            "profitLoss": round(overall_profit_loss, 2),
+            "profitLossPercentage": round(overall_profit_loss_percentage, 2),
+            "cryptos": cryptos
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"msg": "Error al obtener portfolio", "error": str(e)}), 500
 
 @api.route("/operaciones", methods=["GET"])
 @jwt_required()

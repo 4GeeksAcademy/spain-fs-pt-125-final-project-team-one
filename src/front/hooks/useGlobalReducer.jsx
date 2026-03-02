@@ -1,6 +1,8 @@
 // Import necessary hooks and functions from React.
 import { useContext, useReducer, createContext, useEffect } from "react";
-import storeReducer, { initialStore } from "../store"  // Import the reducer and the initial state.
+import storeReducer, { initialStore } from "../store" 
+import { toast } from 'react-toastify';
+ // Import the reducer and the initial state.
 // Import the logout function to handle unauthorized access.
 // Create a context to hold the global state of the application
 // We will call this global state the "store" to avoid confusion while using local states
@@ -26,7 +28,7 @@ export function StoreProvider({ children }) {
         }
         
         dispatch({ type: "SET_MESSAGE", payload: { msg: "Sesión expirada. Por favor, identifícate de nuevo.", status: 401 } });
-    }, 500);
+    }, 1000);
 
     // 3. Limpiar el mensaje tras unos segundos
     setTimeout(() => {
@@ -50,14 +52,14 @@ export function StoreProvider({ children }) {
                     });
                     if (userresponse.status === 401) {
                         handleLogout();
-                        console.log('Token inválido o expirado. Cerrando sesión.');
+                        toast.info('Token inválido o expirado. Cerrando sesión.');
 
                     }
                 } catch (error) {
                     console.error('Error al obtener perfil del usuario:', error);
                 }
             }
-            const options = { method: 'GET', headers: { 'x-cg-demo-api-key': 'CG-zEzVoDknRQgmq3QKL5wFqXh3' } };
+            const options = { method: 'GET', headers: { 'x-cg-demo-api-key': import.meta.env.VITE_API_KEY } };
 
             try {
                 dispatch({ type: 'API_LOADING' });
