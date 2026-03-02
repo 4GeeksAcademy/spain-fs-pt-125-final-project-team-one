@@ -4,6 +4,7 @@ import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import { Login } from "./Login";
 import { Register } from "./Register";
 
+
 export const Navbar = () => {
 
     const { store, dispatch } = useGlobalReducer();
@@ -39,7 +40,7 @@ export const Navbar = () => {
                                         <Link className="nav-link" to="/market">Lista de activos</Link>
                                     </li>
                                     <li className="nav-item">
-                                        <Link className="nav-link" to="/cartera">Cartera</Link>
+                                        <Link className="nav-link" to="/portfolio">Cartera</Link>
                                     </li>
                                     <li className="nav-item">
                                         <Link className="nav-link" to="/operaciones">Operaciones</Link>
@@ -107,3 +108,4 @@ export const Navbar = () => {
         </>
     );
 };
+ 

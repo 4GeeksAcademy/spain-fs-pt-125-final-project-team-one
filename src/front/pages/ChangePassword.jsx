@@ -1,4 +1,5 @@
-import React, { useState, Link } from "react"
+import React, { useState, } from "react"
+import { Link } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 export const ChangePassword = () => {

@@ -11,6 +11,7 @@ import { Perfil } from "./pages/Perfil.jsx"
 import { Market } from "./pages/Market";
 import {Details} from "./pages/Details";
 import { ChangePassword } from "./pages/ChangePassword.jsx"
+import { Portfolio } from "./pages/Portfolio.jsx";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -29,6 +30,7 @@ export const router = createBrowserRouter(
       <Route path="/market/:index" element={<Details />} />
       <Route path="/perfil" element={<Perfil />} />
       <Route path="/change-password" element={<ChangePassword />} />
+      <Route path="/portfolio" element={<Portfolio />} />
     </Route>
   )
 );
