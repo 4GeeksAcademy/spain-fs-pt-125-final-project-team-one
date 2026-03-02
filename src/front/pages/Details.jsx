@@ -143,7 +143,7 @@ export const Details = () => {
                     symbol: `BINANCE:${String(coin.symbol).toUpperCase()}USDT`,
                     interval: 'D',
                     timezone: 'Etc/UTC',
-                    theme: 'light',
+                    theme: 'dark',
                     style: '1',
                     locale: 'es',
                     toolbar_bg: '#f1f3f6',
@@ -183,11 +183,11 @@ export const Details = () => {
     return (
         <div className="container py-4">
             <div className="mb-3">
-                <button className="btn btn-link p-0" onClick={() => navigate('/market')}>← Volver al mercado</button>
+                <button className="btn btn-warning p-2" onClick={() => navigate('/market')}>← Volver al mercado</button>
             </div>
 
-            <div className="card shadow-sm">
-                <div className="card-body">
+            <div className="card shadow-sm border-dark bg-dark text-white">
+                <div className="card-body text-white">
                     <div className="row g-4">
                         <div className="col-md-4 text-center">
                             <img
@@ -198,17 +198,17 @@ export const Details = () => {
                             />
                             <div className="mt-3">
                                 <ul className="list-group list-group-flush text-start">
-                                    <li className="list-group-item d-flex justify-content-between align-items-center py-2">
+                                    <li className="list-group-item d-flex justify-content-between align-items-center py-2 bg-dark text-white">
                                         <span className="fw-bold">Precio</span>
                                         <span className="text-end">{coin?.market_data?.current_price?.usd ?? product.price ?? 'N/A'} $</span>
                                     </li>
 
-                                    <li className="list-group-item d-flex justify-content-between align-items-center py-2">
+                                    <li className="list-group-item d-flex justify-content-between align-items-center py-2 bg-dark text-white">
                                         <span className="fw-bold">Market Cap</span>
                                         <span className="text-end">{coin?.market_data?.market_cap?.usd ?? 'N/A'} $</span>
                                     </li>
 
-                                    <li className="list-group-item d-flex justify-content-between align-items-center py-2">
+                                    <li className="list-group-item d-flex justify-content-between align-items-center py-2 bg-dark text-white">
                                         <span className="fw-bold">Volumen (24h)</span>
                                         <span className="text-end">{coin?.market_data?.total_volume?.usd ?? 'N/A'} $</span>
                                     </li>
@@ -255,7 +255,7 @@ export const Details = () => {
 
                                     </div>
 
-                                    <p className="text-muted">
+                                    <p className="text-white">
                                         {coin?.description?.en
                                             ? String(coin.description.en).replace(/<[^>]+>/g, '').slice(0, 400)
                                             : product.description ?? ''}
@@ -264,8 +264,8 @@ export const Details = () => {
                                     <div id={tvContainerId} className="mt-3" />
 
                                     {coin?.links?.homepage?.[0] ? (
-                                        <p className="mt-3">
-                                            <a href={coin.links.homepage[0]} target="_blank" rel="noreferrer" className="btn btn-link">
+                                        <p className="btn btn-warning mt-3">
+                                            <a href={coin.links.homepage[0]} target="_blank" rel="noreferrer" className="btn text-dark">
                                                 Página oficial de la moneda
                                             </a>
                                         </p>
@@ -307,7 +307,7 @@ export const Details = () => {
 
                                         </div>
                                         <button
-                                            className="btn btn-primary me-2"
+                                            className="btn btn-warning me-2"
                                             onClick={handleAddPortfolioClick}
                                             disabled={addingPortfolio}
                                         >
