@@ -43,7 +43,7 @@ export const Navbar = () => {
                                         <Link className="nav-link" to="/market"><strong className="fs-4">Lista de activos</strong></Link>
                                     </li>
                                     <li className="nav-item">
-                                        <Link className="nav-link" to="/portfolio">Cartera</Link>
+                                        <Link className="nav-link" to="/portfolio"><strong className="fs-4">Cartera</strong></Link>
                                     </li>
                                     <li className="nav-item">
                                         <Link className="nav-link" to="/operaciones"><strong className="fs-4">Operaciones</strong></Link>
