@@ -2,6 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
+import requests
 from api.models import db, User, Portfolio, Operations
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
@@ -417,6 +418,7 @@ def get_user_portfolio_data():
         overall_profit_loss_percentage = (overall_profit_loss / total_invested * 100) if total_invested > 0 else 0
         
         return jsonify({
+            "currentPrices": current_prices,
             "totalValue": round(total_value, 2),
             "totalInvested": round(total_invested, 2),
             "profitLoss": round(overall_profit_loss, 2),
