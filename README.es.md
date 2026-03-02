@@ -6,7 +6,7 @@ Construye aplicaciones web usando React.js para el front end y python/flask para
 - Aquí hay un video sobre [cómo usar esta plantilla](https://www.youtube.com/watch?v=qBz6Ddd2m38)
 - Integrado con Pipenv para la gestión de paquetes.
 - Despliegue rápido a Render [en solo unos pocos pasos aquí](https://4geeks.com/es/docs/start/despliega-con-render-com).
-- Uso del archivo .env.
+- Uso del archivo: .env.
 - Integración de SQLAlchemy para la abstracción de bases de datos.
 
 ### 1) Instalación:
@@ -33,7 +33,7 @@ Se recomienda instalar el backend primero, asegúrate de tener Python 3.10, Pipe
 
 ### Deshacer una migración
 
-También puedes deshacer una migración ejecutando
+También puedes deshacer una migración ejecutando:
 
 ```sh
 $ pipenv run downgrade
