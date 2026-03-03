@@ -57,34 +57,13 @@ export const Operaciones = () => {
             <h1 className="mb-5 px-3 text-center text-warning">
                 <i className="bi bi-currency-exchange me-2"></i>  Mis Operaciones</h1>
 
-            <div className="d-flex gap-4 justify-content-center mb-5 flex-wrap ">
-                <button
-                    className={`btn ${filtro === 'todas' ? 'btn-primary' : 'btn-outline-primary'}`}
-                    onClick={() => setFiltro('todas')}
-                >
-                    <i className="bi bi-list-ul"></i> Todas
-                </button>
-                <button
-                    className={`btn ${filtro === 'compra' ? 'btn-primary' : 'btn-outline-primary'}`}
-                    onClick={() => setFiltro('compra')}
-                >
-                    <i className="bi bi-cart-plus"></i>  Compras
-                </button>
-                <button
-                    className={`btn ${filtro === 'venta' ? 'btn-primary' : 'btn-outline-primary'}`}
-                    onClick={() => setFiltro('venta')}
-                >
-                    <i className="bi bi-cash-stack"></i>   Ventas
-                </button>
-            </div>
-
             {operacionesFiltradas.length === 0 ? (
                 <div className="alert alert-info text-center bg-secondary text-white w-25 mx-auto">
                     <i className="bi bi-info-circle me-2"></i>No hay operaciones</div>
             ) : (
-                <div className="table-responsive w-100 my-3 border-top border-bottom border-secondary">
-                    <table className="table table-striped table-hover w-100 m-0 text-center">
-                        <thead className="encabezado-estilo border-bottom border-secondary">
+                <div className="table-responsive my-3 border-top border-bottom border-dark mx-5">
+                    <table className="table table-striped table-hover text-center">
+                        <thead className="table-warning text-dark border-bottom border-dark">
                             <tr>
                                 <th><i className="bi bi-calendar3 me-2"></i>Fecha</th>
                                 <th><i className="bi bi-arrow-left-right me-2"></i>Operación</th>
@@ -99,7 +78,7 @@ export const Operaciones = () => {
                                 const isCompra = op.tipo === 'compra' || op.bought === true;
                                 const displayTipo = isCompra ? 'compra' : 'venta';
                                 return (
-                                    <tr className="table-secondary" key={op.id}>
+                                    <tr className="table-warning table-opacity-25" key={op.id}>
                                         <td>{new Date(op.fecha).toLocaleDateString()}</td>
                                         <td>
                                             <span className={`badge ${isCompra ? 'bg-info' : 'bg-success'}`}>
